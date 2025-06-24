@@ -1,0 +1,58 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Master.master.cs" Inherits="Web.MP.Master" %>
+
+<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="asp" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Ordenes de Pedido</title>
+    <link href="../App_Themes/Tema1/Site.css" rel="stylesheet" type="text/css" />
+    <link href="../App_Themes/Tema1/Images/LogoGestion.ico" type="image/x-icon" rel="shortcut icon" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="page">
+        <div class="header">
+            <div class="title">
+            
+                <h1>
+                    <img src="../App_Themes/Tema1/Images/logo-villaallende.jpg"  alt="Consejo"  
+                        style="margin-top:5px; height: 78px; width: 135px;"  />
+                    
+                </h1>
+            </div>
+            <div id="Consejo" 
+                style="font-family: Calibri; font-size: medium; font-weight: bold; font-style: normal; font-variant: small-caps; text-transform: capitalize; color: #FFFFFF">
+                &nbsp&nbsp&nbsp Municipalidad de Villa Allende <br /> &nbsp&nbsp&nbsp Ordenes de Pedido <br /> &nbsp&nbsp&nbsp On Line
+                <br />
+            </div>
+            <div class="clear hideSkiplink">
+                <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu" EnableViewState="false" IncludeStyleBlock="false" Orientation="Horizontal">
+                    <Items>
+                        <asp:MenuItem Text="Inicio" NavigateUrl="~/Secure/Home.aspx" Value="Inicio">
+                        </asp:MenuItem>
+                        <asp:MenuItem Text="Ordenes" Value="Nueva Orden">
+                            <asp:MenuItem NavigateUrl="~/Secure/newOp.aspx?op=0" Text="Agregar Ordenes" 
+                                Value="Agregar Ordenes"></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/Secure/findOP.aspx" Text="Buscar Ordenes" 
+                                Value="Buscar Ordenes"></asp:MenuItem>
+                        </asp:MenuItem>
+                    </Items>
+                </asp:Menu>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+    </div>
+    </form>
+</body>
+</html>

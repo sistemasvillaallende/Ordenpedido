@@ -1,0 +1,56 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site2.master.cs" Inherits="Web.MP.Site2" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Ordenes de Pedido</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="http://getbootstrap.com/assets/ico/favicon.ico">
+    <!-- Bootstrap core CSS -->
+    <link href="../App_Themes/Tema1/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="../App_Themes/Tema1/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="../App_Themes/Tema1/theme.css" rel="stylesheet">
+    <link href="../App_Themes/Tema1/Site.css" rel="stylesheet">
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+            <br />
+            <h3 style="color:White;">Municipalidad de Villa Allende</h3>
+            <h4 style="color:White;">Ordenes de Pedido onLine</h4>
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color:White; text-decoration:blink;">Ordenes de Pedido <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Agregar Orden</a></li>
+                            <li><a href="#">Buscar Orden</a></li>
+                            <li class="divider"></li>
+                        </ul>
+                    </li>
+			        <li><a href="#">Salir</a></li>
+			    </ul>
+            </div>
+            </div>
+        </div> 
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+        <script src="../Script/jquery.min.js"></script>
+        <script src="../Script/bootstrap.min.js"></script>
+        <script src="../Script/docs.min.js"></script>
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </form>
+</body>
+</html>

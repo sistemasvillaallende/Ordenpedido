@@ -1,0 +1,13 @@
+﻿body {
+}
+.autocomplete_ListadeElementos
+{
+    font-family:Arial;font-size:small;margin : 0px!important;
+    background-color : inherit;color : windowtext;border : buttonshadow;
+    border-width : 1px;border-style : solid; cursor : 'default';overflow : auto;
+    height : 200px;text-align : left; list-style-type : none;
+}
+.autocomplete_Seleccion
+{background-color:#1C6DB2;color:#D4E0EE;padding:1px;}
+.autocomplete_Listado
+{background-color:#E6E9EE;color:windowtext;padding:1px;}

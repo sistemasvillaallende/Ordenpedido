@@ -1,0 +1,9 @@
+D:\Dev\NET2018\OP\trunk\DAL\bin\Debug\DAL.dll
+D:\Dev\NET2018\OP\trunk\DAL\bin\Debug\DAL.pdb
+D:\Dev\NET2018\OP\trunk\DAL\bin\Debug\Entities.dll
+D:\Dev\NET2018\OP\trunk\DAL\bin\Debug\Entities.pdb
+D:\Dev\NET2018\OP\trunk\DAL\obj\Debug\DAL.csprojAssemblyReference.cache
+D:\Dev\NET2018\OP\trunk\DAL\obj\Debug\DAL.csproj.CoreCompileInputs.cache
+D:\Dev\NET2018\OP\trunk\DAL\obj\Debug\DAL.csproj.CopyComplete
+D:\Dev\NET2018\OP\trunk\DAL\obj\Debug\DAL.dll
+D:\Dev\NET2018\OP\trunk\DAL\obj\Debug\DAL.pdb
