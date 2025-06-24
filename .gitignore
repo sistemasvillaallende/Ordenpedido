@@ -1,0 +1,53 @@
+## Archivos de usuario de Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Binarios y builds
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+*.dll
+*.exe
+*.log
+
+## Paquetes NuGet
+*.nupkg
+packages/
+*.snupkg
+
+## Configuración local
+*.local.json
+*.config.user
+*.dbmdl
+*.pdb
+*.cache
+*.ide
+
+## Publicaciones y publicaciones temporales
+publish/
+*.publish.xml
+
+## Archivos de copia de seguridad
+*~
+*.bak
+Archivos de copia de seguridad de Crystal Reports/
+
+## Archivos de sistema
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## Otros
+_ReSharper*/
+*.ncrunch*
+*.vscode/
+node_modules/
+
+## Ignorar directorios comunes del proyecto
+wwwroot/
+logs/
+coverage/

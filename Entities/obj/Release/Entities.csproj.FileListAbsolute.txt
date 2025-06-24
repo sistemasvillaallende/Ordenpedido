@@ -1,6 +1,0 @@
-D:\Dev\NET2018\OP\trunk\Entities\bin\Release\Entities.dll
-D:\Dev\NET2018\OP\trunk\Entities\bin\Release\Entities.pdb
-D:\Dev\NET2018\OP\trunk\Entities\obj\Release\Entities.csprojAssemblyReference.cache
-D:\Dev\NET2018\OP\trunk\Entities\obj\Release\Entities.csproj.CoreCompileInputs.cache
-D:\Dev\NET2018\OP\trunk\Entities\obj\Release\Entities.dll
-D:\Dev\NET2018\OP\trunk\Entities\obj\Release\Entities.pdb

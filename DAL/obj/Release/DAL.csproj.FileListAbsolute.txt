@@ -1,9 +1,0 @@
-D:\Dev\NET2018\OP\trunk\DAL\bin\Release\DAL.dll
-D:\Dev\NET2018\OP\trunk\DAL\bin\Release\DAL.pdb
-D:\Dev\NET2018\OP\trunk\DAL\bin\Release\Entities.dll
-D:\Dev\NET2018\OP\trunk\DAL\bin\Release\Entities.pdb
-D:\Dev\NET2018\OP\trunk\DAL\obj\Release\DAL.csprojAssemblyReference.cache
-D:\Dev\NET2018\OP\trunk\DAL\obj\Release\DAL.csproj.CoreCompileInputs.cache
-D:\Dev\NET2018\OP\trunk\DAL\obj\Release\DAL.csproj.CopyComplete
-D:\Dev\NET2018\OP\trunk\DAL\obj\Release\DAL.dll
-D:\Dev\NET2018\OP\trunk\DAL\obj\Release\DAL.pdb
