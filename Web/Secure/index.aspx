@@ -58,9 +58,12 @@
                                         runat="server">
                                         <span class="fa fa-edit" style="font-size: 20px;"></span>
                                     </asp:LinkButton>
-                                    <a target="_blank" href="../Reportes/Print.aspx?nroOrden=<%#Eval("nroOrden")%>">
+                                    <a target="_blank" href="../Reportes/ReporteOrdenPedido.aspx?nroOrden=<%#Eval("nroOrden")%>">
                                         <span class="fa fa-print" style="font-size: 20px;"></span>
                                     </a>
+                                    <%--<a target="_blank" href="../Reportes/Print.aspx?nroOrden=<%#Eval("nroOrden")%>">
+                                        <span class="fa fa-print" style="font-size: 20px;"></span>
+                                    </a>--%>
                                 </ItemTemplate>
                             </asp:TemplateField>
                         </Columns>

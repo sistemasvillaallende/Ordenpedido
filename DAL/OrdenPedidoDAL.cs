@@ -21,7 +21,8 @@ namespace DAL
 
             cmd = new SqlCommand();
 
-            string strSQL = "SELECT CONVERT(VARCHAR(10), GETDATE(),103) as fecha";
+            string strSQL = "SELECT CONVERT(VARCHAR(19), GETDATE(), 103) + ' ' + CONVERT(VARCHAR(8), GETDATE(), 108) AS fecha";
+            //"SELECT CONVERT(VARCHAR(10), GETDATE(),103) as fecha";
             try
             {
                 cn = DALBase.GetConnection();

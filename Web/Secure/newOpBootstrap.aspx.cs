@@ -169,8 +169,7 @@ namespace Web.Secure
             txtBuscarProv.Focus();
             popUpProveedor.Show();
         }
-
-
+        
         //METODO QUE CARGA LA GRILLA DE PROVEEDORES///////////////////////////////////////////////////
         protected void fillProveedores(string nombre)
         {
