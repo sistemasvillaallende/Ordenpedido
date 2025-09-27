@@ -1,35 +1,9 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MP/Bootstrap.Master" AutoEventWireup="true" CodeBehind="newOpBootstrap.aspx.cs" Inherits="Web.Secure.newOpBootstrap" %>
-
-<%--<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>--%>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MP/Bootstrap.Master" AutoEventWireup="true"
+    CodeBehind="newOpBootstrap.aspx.cs" Inherits="Web.Secure.newOpBootstrap" %>
 
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <style type="text/css">
-        .auto-style1 {
-            position: relative;
-            min-height: 1px;
-            float: left;
-            width: 25%;
-            left: 0px;
-            top: 0px;
-            height: 84px;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        .auto-style2 {
-            display: table-cell;
-            width: 1%;
-            white-space: nowrap;
-            vertical-align: middle;
-            position: relative;
-            font-size: 0;
-            left: -466px;
-            top: -2314px;
-        }
-    </style>
-
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
@@ -43,15 +17,19 @@
             </div>
             <div class="box-body">
                 <div class="form-group">
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
                         <label for="nroOrden">Nro. Orden de Pedido</label>
                         <p class="form-control-static" id="txtOP" runat="server">0000</p>
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
                         <label for="fecha">Fecha</label>
                         <p class="form-control-static" id="txtFechaOp" runat="server"></p>
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
+                        <label for="estado">Estado OP</label>
+                        <p class="form-control-static" id="txtEstado_op" runat="server"></p>
+                    </div>
+                    <div class="col-sm-3">
                         <label for="fecha">Origen</label>
                         <p class="form-control-static" id="P1" runat="server"></p>
                     </div>
@@ -72,7 +50,7 @@
                     <ContentTemplate>
                         <div class="form-group">
                             <div class="row">
-                                <div class="auto-style1">
+                                <div class="col-xs-3">
                                     <label for="fecha">Proveedor</label>
                                     <asp:TextBox ID="txtIdProv" CssClass="form-control" runat="server"
                                         placeholder="Ingrese codigo" AutoPostBack="True"
@@ -90,8 +68,9 @@
                                         <input type="text" class="form-control" id="txtNameProv" runat="server" readonly="true" />
                                         <span class="input-group-btn">
                                             <div class="btn-group">
-                                                <asp:LinkButton ID="lnkFindProv" CssClass="btn btn-default" runat="server" OnClick="btnFindProv_click">
-                                            <i class="fa fa-plus"></i> Buscar Proveedor
+                                                <asp:LinkButton ID="lnkFindProv" CssClass="btn btn-default" runat="server"
+                                                    OnClientClick="$('#modalBuscarProveedor').modal('show'); return false;">
+                                                    <i class="fa fa-plus"></i> Buscar Proveedor
                                                 </asp:LinkButton>
                                             </div>
                                         </span>
@@ -99,7 +78,6 @@
                                 </div>
                             </div>
                         </div>
-
 
                         <div class="modal fade in" id="actualizacuit">
                             <div class="modal-dialog">
@@ -143,8 +121,12 @@
                                         class="form-control" AutoPostBack="True"
                                         OnTextChanged="txtIdDestino_TextChanged1">
                                     </asp:TextBox>
-                                    <asp:CompareValidator ID="CompareValidator5" runat="server" ErrorMessage="Debe ingresar Oficina Detino" ControlToValidate="txtIdDestino" Operator="DataTypeCheck" Type="Integer" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:CompareValidator>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="txtIdDestino" ErrorMessage="Debe Seleccionar Oficina Destino" SetFocusOnError="True" ValidationGroup="GroupDatos">*</asp:RequiredFieldValidator>
+                                    <asp:CompareValidator ID="CompareValidator5" runat="server" ErrorMessage="Debe ingresar Oficina Detino"
+                                        ControlToValidate="txtIdDestino" Operator="DataTypeCheck" Type="Integer"
+                                        ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:CompareValidator>
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="txtIdDestino"
+                                        ErrorMessage="Debe Seleccionar Oficina Destino" SetFocusOnError="True"
+                                        ValidationGroup="GroupDatos">*</asp:RequiredFieldValidator>
                                 </div>
                                 <div class="col-xs-9">
                                     <label for="fecha">Nombre Oficina</label>
@@ -152,14 +134,10 @@
                                         <input type="text" class="form-control" id="txtNameDestino" readonly="true" runat="server" />
                                         <span class="input-group-btn">
                                             <div class="btn-group">
-                                                <%--<button class="btn btn-primary btn-sm" type="button"
-                                                    id="btnFindDest" runat="server" onserverclick="btnFindDest_click">
-                                                    <span class="fa fa-search"></span>Buscar
-                                                </button>--%>
-                                                <asp:LinkButton ID="lnkFinDest" CssClass="btn btn-default" runat="server" OnClick="btnFindDest_click">
-                                            <i class="fa fa-desktop"></i> Buscar Destino
+                                                <asp:LinkButton ID="lnkFinDest" CssClass="btn btn-default" runat="server"
+                                                    OnClientClick="$('#modalBuscarOficina').modal('show'); return false;">
+                                                    <i class="fa fa-desktop"></i> Buscar Destino
                                                 </asp:LinkButton>
-
                                             </div>
                                         </span>
                                     </div>
@@ -173,20 +151,50 @@
                 <asp:UpdatePanel ID="UPanelDatos" runat="server" UpdateMode="Conditional">
                     <Triggers>
                         <asp:PostBackTrigger ControlID="btnConsulta" />
+                        <asp:PostBackTrigger ControlID="btnProcesarExcel" />
                     </Triggers>
                     <ContentTemplate>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-6">
+                                    <label for="ejemplo_email_1">SecretariaAutoriza</label>
+                                    <asp:DropDownList ID="ddlSecretariaAutoriza" runat="server" CssClass="form-control"
+                                        AutoPostBack="True" OnSelectedIndexChanged="ddlSecretariaAutoriza_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                    <asp:RequiredFieldValidator ID="rfvSecretariaAutoriza" runat="server"
+                                        ErrorMessage="Debe seleccionar Secretaría" 
+                                        ControlToValidate="ddlSecretariaAutoriza"
+                                        InitialValue="0"
+                                        ValidationGroup="GroupDatos" 
+                                        SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                    &nbsp;
+                                </div>
+                                <div class="col-xs-6">
+                                    <label for="ejemplo_email_1">Direccion Solicitante</label>
+                                    <asp:DropDownList ID="ddlDireccionSolicitante" runat="server" CssClass="form-control"
+                                        AutoPostBack="True" OnSelectedIndexChanged="ddlDireccionSolicitante_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                    <asp:RequiredFieldValidator ID="rfvDireccionSolicitante" runat="server"
+                                        ErrorMessage="Debe seleccionar Dirección" 
+                                        ControlToValidate="ddlDireccionSolicitante"
+                                        InitialValue="0"
+                                        ValidationGroup="GroupDatos" 
+                                        SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-6">
                                     <label for="ejemplo_email_1">Autorizado Por</label>
-                                    <input type="text" class="form-control" id="txtAut"
+                                    <input type="text" class="form-control" id="txtAut" disabled="disabled"
                                         runat="server" placeholder="Introduzca el nombre de quien autoriza" />
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Debe Ingresar Campo Autorizado Por" ControlToValidate="txtAut" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
                                     &nbsp;
                                 </div>
                                 <div class="col-xs-6">
                                     <label for="ejemplo_email_1">Solicitante</label>
-                                    <input type="text" class="form-control" id="txtSolicitante"
+                                    <input type="text" class="form-control" id="txtSolicitante" disabled="disabled"
                                         runat="server" placeholder="Introduzca el nombre de quien solicita" />
                                 </div>
                             </div>
@@ -474,12 +482,19 @@
                     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
                         <ContentTemplate>
                             <div class="btn-group">
-                                <%--<button type="button" class="btn btn-primary"
-                                    runat="server" id="btnAddDetalle" onserverclick="btnAddDetalle_click">
-                                    <span class="glyphicon glyphicon-plus-sign">Agregar
-                                </button>--%>
-                                <asp:LinkButton ID="lbtnAddDetalle" CssClass="btn btn-default" runat="server" OnClick="lbtnAddDetalle_Click">
+
+                                <%--<asp:LinkButton ID="lbtnAddDetalle" CssClass="btn btn-default" runat="server" OnClick="lbtnAddDetalle_Click">
                                             <i class="fa fa-plus"></i> Agregar Detalle
+                                </asp:LinkButton>--%>
+                                <asp:LinkButton ID="LinkButton1" CssClass="btn btn-default" runat="server"
+                                    OnClientClick="$('#modalAgregarDetalle').modal('show'); return false;"
+                                    OnClick="LinkButton1_Click">
+                                    <i class="fa fa-plus"></i> Agregar Detalle
+                                </asp:LinkButton>
+
+                                <asp:LinkButton ID="lbtnAddExcel" CssClass="btn btn-default" runat="server"
+                                    OnClientClick="$('#modalSubirExcel').modal('show'); return false;">
+                                    <i class="fa fa-plus"></i> Subir Excel
                                 </asp:LinkButton>
                             </div>
                         </ContentTemplate>
@@ -502,11 +517,11 @@
                                     <HeaderStyle BackColor="#d9edf7" />
                                 </asp:BoundField>
                                 <asp:BoundField DataField="precio" HeaderText=" Precio"
-                                    DataFormatString="{0:C}">
+                                    DataFormatString="{0:N2}">
                                     <HeaderStyle BackColor="#d9edf7" />
                                 </asp:BoundField>
                                 <asp:BoundField DataField="importe" HeaderText=" Importe"
-                                    DataFormatString="{0:C}">
+                                    DataFormatString="{0:N2}">
                                     <HeaderStyle BackColor="#d9edf7" />
                                 </asp:BoundField>
                                 <asp:TemplateField HeaderText="Accion">
@@ -552,7 +567,7 @@
                             </button>
                             <button type="button" class="btn btn-primary"
                                 runat="server" id="btnAddOrden" onserverclick="btnAddOrden_click">
-                                <span class="glyphicon glyphicon-plus"></span>Agregar Orden
+                                <span class="glyphicon glyphicon-plus"></span>Agregar Nueva Orden
                             </button>
                         </div>
                     </div>
@@ -561,223 +576,275 @@
         </div>
         <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
         <!-- //POPUP DESTINO////////////////////////////////////////////////////////////////////// -->
-        <asp:Button ID="Button4" runat="server" Text="Button" Style="visibility: hidden;" />
-        <ajaxToolkit:ModalPopupExtender runat="server"
-            BackgroundCssClass="modalBackground"
-            PopupControlID="modalOficina"
-            BehaviorID="popUpOficina"
-            TargetControlID="Button4"
-            ID="popUpOficina">
-        </ajaxToolkit:ModalPopupExtender>
-        <div style="padding: 10px; width: 55%; background-color: White; box-shadow: 0px 0px 10px #000;"
-            id="modalOficina" runat="server" class="panel panel-info">
-            <br />
-            <div class="panel-heading">Buscar Oficina de Destino</div>
-            <div class="panel-body">
-                <asp:UpdatePanel ID="UpdatePanel3" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
-                        <br />
-                        Destino
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="txtFindDest" runat="server" />
-                            <span class="input-group-btn">
-                                <div class="btn-group">
-                                    <button class="btn btn-primary btn-sm" type="button"
-                                        runat="server" id="btnBuscarDest" onserverclick="btnBuscarDest_click">
-                                        <span class="glyphicon glyphicon-search"></span>Buscar
-                                    </button>
-                                </div>
-                            </span>
-                        </div>
-                        <br />
-                        <div style="overflow: scroll; height: 150px;">
-                            <asp:GridView ID="gvOficinas" runat="server" AutoGenerateColumns="False"
-                                CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%"
-                                DataKeyNames="idOficina,nombre" CssClass="table table-hover"
-                                OnRowCommand="gvOficinas_RowCommand" OnRowCreated="gvOficinas_RowCreated">
-                                <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
-                                <Columns>
-                                    <asp:BoundField DataField="idOficina" HeaderText="Codigo" />
-                                    <asp:BoundField DataField="nombre" HeaderText="Nombre" />
-                                    <asp:TemplateField HeaderText="Seleccionar">
-                                        <ItemTemplate>
-                                            <asp:ImageButton ID="imgbSeleccionar" runat="server" CommandName="selected"
-                                                ImageUrl="~/App_Themes/Tema1/Images/masGrilla.gif" CausesValidation="False" />
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
-                                </Columns>
-                                <EditRowStyle BackColor="#999999" />
-                                <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                                <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                                <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
-                                <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
-                                <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
-                                <SortedAscendingCellStyle BackColor="#E9E7E2" />
-                                <SortedAscendingHeaderStyle BackColor="#506C8C" />
-                                <SortedDescendingCellStyle BackColor="#FFFDF8" />
-                                <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
-                            </asp:GridView>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal"
-                                runat="server" id="btnCancelDest" onserverclick="btnCancelDest_click">
-                                Cancelar</button>
-                        </div>
-                    </ContentTemplate>
-                </asp:UpdatePanel>
-            </div>
-        </div>
-        <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
-        <!-- ////////////////////////////// POPUP PROVEEDOR ///////////////////////////////////////// -->
-
-
-
-
-
-        <div class="form-group">
-            <asp:HiddenField ID="HiddenField1" runat="server" />
-            <asp:Button ID="Button3" runat="server" Text="Button" Style="visibility: hidden;" />
-            <ajaxToolkit:ModalPopupExtender runat="server"
-                BackgroundCssClass="modalBackground"
-                PopupControlID="modalProveedor"
-                BehaviorID="popUpProveedor"
-                TargetControlID="Button3"
-                ID="popUpProveedor">
-            </ajaxToolkit:ModalPopupExtender>
-            <div style="padding: 20px; width: 55%; background-color: White; box-shadow: 0px 0px 10px #000;"
-                id="modalProveedor" runat="server" class="panel panel-info">
-                <div class="panel-heading">Buscar Proveedor</div>
-                <div class="panel-body">
-                    <br />
-                    <asp:UpdatePanel ID="UpdatePanel4" runat="server" UpdateMode="Conditional">
-                        <ContentTemplate>
-                            <label for="fecha">Razon Social</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="txtBuscarProv" runat="server" />
-                                <span class="input-group-btn">
-                                    <div class="btn-group">
-                                        <button class="btn btn-primary sm" type="button"
-                                            runat="server" id="btnBuscar" onserverclick="btnBuscar_click">
-                                            <span class="glyphicon glyphicon-search"></span>Buscar
-                                        </button>
-                                    </div>
-                                </span>
-                            </div>
-                            <div style="overflow: scroll; height: 150px;">
-                                <br />
-                                <asp:GridView ID="gvProv" runat="server" AutoGenerateColumns="False"
-                                    CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%"
-                                    DataKeyNames="codProveedor,nomProveedor,nroCuit"
-                                    OnRowCommand="gvProv_RowCommand" OnRowCreated="gvProv_RowCreated"
-                                    CssClass="table table-hover">
-                                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
-                                    <Columns>
-                                        <asp:BoundField DataField="codProveedor" HeaderText="Codigo" />
-                                        <asp:BoundField DataField="nomProveedor" HeaderText="Nombre" />
-                                        <asp:BoundField DataField="nroCuit" HeaderText="CUIT" />
-                                        <asp:BoundField DataField="nroBad" HeaderText="Nro BAD" />
-                                        <asp:TemplateField HeaderText="Seleccionar">
-                                            <ItemTemplate>
-                                                <asp:ImageButton ID="imgbSeleccionar" runat="server" CommandName="selected"
-                                                    ImageUrl="~/App_Themes/Tema1/Images/masGrilla.gif" CausesValidation="False" />
-                                            </ItemTemplate>
-                                        </asp:TemplateField>
-                                    </Columns>
-                                    <EditRowStyle BackColor="#999999" />
-                                    <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                                    <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
-                                    <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
-                                    <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
-                                    <SortedAscendingCellStyle BackColor="#E9E7E2" />
-                                    <SortedAscendingHeaderStyle BackColor="#506C8C" />
-                                    <SortedDescendingCellStyle BackColor="#FFFDF8" />
-                                    <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
-                                </asp:GridView>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary -sm" data-dismiss="modal"
-                                    runat="server" id="btnCancelProv" onserverclick="btnCancelProv_click">
-                                    Cancelar</button>
-                            </div>
-                        </ContentTemplate>
-                    </asp:UpdatePanel>
-                </div>
-            </div>
-        </div>
-        <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
-        <!-- ////////////////////////////// POPUP DETALLE //////////////////////////////////////// -->
-        <asp:HiddenField ID="HiddenField3" runat="server" />
-        <asp:Button ID="Button5" runat="server" Text="Button" Style="visibility: hidden;" />
-        <ajaxToolkit:ModalPopupExtender runat="server"
-            BackgroundCssClass="modalBackground"
-            PopupControlID="modalDetalleCarga"
-            BehaviorID="popUpDetalle"
-            TargetControlID="Button5"
-            ID="popUpDetalle">
-        </ajaxToolkit:ModalPopupExtender>
-        <div style="padding: 10px; width: 36%; background-color: White; box-shadow: 0px 0px 10px #000;"
-            id="modalDetalleCarga" runat="server" class="panel panel-info">
-            <div class="panel-heading">
-                <h4>Agregar Items</h4>
-            </div>
-            <div class="panel-body">
-                <asp:UpdatePanel ID="UpdatePanel5" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
-                        <%--                        <div class="form-group">
-                            <label for="ejemplo_email_1">Factura</label>
-                            <br />
-                            <asp:DropDownList ID="DDLFactura" CssClass="form-control" runat="server"></asp:DropDownList>
-                        </div>--%>
-                        <div class="form-group">
-                            <label for="ejemplo_email_1">Descripcion</label>
-                            <br />
-                            <asp:TextBox ID="txtDescripcion" runat="server" autocomplete="false" Width="90%"
-                                placeholder="Ingrese descripcion del Articulo / Servicio" CssClass="form-control"></asp:TextBox>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ValidationGroup="GroupItems" ControlToValidate="txtDescripcion" ErrorMessage="Debe Seleccionar Descripcion del Item" SetFocusOnError="True">*</asp:RequiredFieldValidator>
-                        </div>
-                        <div class="form-group">
-                            <label for="ejemplo_email_1">Cantidad</label>
-                            <br />
-                            <asp:TextBox ID="txtCantidad" runat="server" Width="90%" autocomplete="false"
-                                placeholder="Cantidad" AutoPostBack="True" CssClass="form-control"
-                                OnTextChanged="txtCantidad_TextChanged"></asp:TextBox>
-                            <asp:CompareValidator ID="CompareValidator2" runat="server" ValidationGroup="GroupItems" ControlToValidate="txtCantidad" ErrorMessage="Debe Ingresar Cantidad" Type="Double" Operator="DataTypeCheck">*</asp:CompareValidator>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server" ControlToValidate="txtCantidad" ErrorMessage="Debe ingresar Cantidad" SetFocusOnError="True" ValidationGroup="GroupItems">*</asp:RequiredFieldValidator>
-                        </div>
-                        <div class="form-group">
-                            <label for="ejemplo_email_1">Precio Unitario</label>
-                            <br />
-                            <asp:TextBox ID="txtPU" runat="server" Width="90%" autocomplete="false" CssClass="form-control"
-                                placeholder="Precio Unitario" OnTextChanged="txtPU_TextChanged"
-                                AutoPostBack="True"></asp:TextBox>
-                            <asp:CompareValidator ID="CompareValidator3" runat="server" ValidationGroup="GroupItems" ControlToValidate="txtPU" ErrorMessage="Debe Ingresar Importe" Type="Double" Operator="DataTypeCheck">*</asp:CompareValidator>
-                            <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="txtPU" ErrorMessage="Debe ingresar Precio Unitario" SetFocusOnError="True" ValidationGroup="GroupItems">*</asp:RequiredFieldValidator>
-                        </div>
-                        <br />
-                        <asp:ValidationSummary ID="ValidationSummary1" runat="server" ForeColor="Red" ValidationGroup="GroupItems" Width="409px" />
-                        <br />
-                        <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+        <!-- MODAL BUSCAR OFICINA DE DESTINO (Bootstrap) -->
+        <div class="modal fade" id="modalBuscarOficina" tabindex="-1" role="dialog" aria-labelledby="modalBuscarOficinaLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="modalBuscarOficinaLabel">
+                            <i class="fa fa-building"></i>Buscar Oficina de Destino
+                </h4>
+                    </div>
+                    <div class="modal-body">
+                        <asp:UpdatePanel ID="UpdatePanel3" runat="server" UpdateMode="Conditional">
                             <ContentTemplate>
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-sm"
-                                        runat="server" id="Button2" onserverclick="btnAceptar_Click" validationgroup="GroupItems">
-                                        Aceptar</button>
-                                    <button type="button" class="btn btn-sm"
-                                        runat="server" id="Button1" onserverclick="btnCancelar_Click">
-                                        Salir</button>
+                                    <label>Buscar por nombre de oficina</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="txtFindDest" runat="server"
+                                            placeholder="Ingrese nombre de la oficina" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary btn-sm" type="button"
+                                                runat="server" id="btnBuscarDest" onserverclick="btnBuscarDest_click">
+                                                <span class="glyphicon glyphicon-search"></span>Buscar
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="max-height: 300px; overflow-y: auto;">
+                                        <asp:GridView ID="gvOficinas" runat="server" AutoGenerateColumns="False"
+                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%"
+                                            DataKeyNames="idOficina,nombre" CssClass="table table-hover table-striped"
+                                            OnRowCommand="gvOficinas_RowCommand" OnRowCreated="gvOficinas_RowCreated"
+                                            EmptyDataText="No se encontraron oficinas. Realice una búsqueda.">
+                                            <Columns>
+                                                <asp:BoundField DataField="idOficina" HeaderText="Código">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="nombre" HeaderText="Nombre de Oficina">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="Seleccionar">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" Width="100px" />
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="btnSeleccionar" runat="server" CommandName="selected"
+                                                            CssClass="btn btn-sm btn-success"
+                                                            CommandArgument='<%# Container.DataItemIndex %>'
+                                                            CausesValidation="False">
+                                                    <i class="fa fa-check"></i> Seleccionar
+                                                </asp:LinkButton>
+                                                    </ItemTemplate>
+                                                </asp:TemplateField>
+                                            </Columns>
+                                            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                                            <EditRowStyle BackColor="#999999" />
+                                            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                                            <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                                            <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                                        </asp:GridView>
+                                    </div>
                                 </div>
                             </ContentTemplate>
                         </asp:UpdatePanel>
-                        <br />
-                        </fieldset>
-                    </ContentTemplate>
-                </asp:UpdatePanel>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times"></i>Cancelar
+                       
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- ////////////////////////////// POPUP PROVEEDOR ///////////////////////////////////////// -->
+        <!-- MODAL BUSCAR PROVEEDOR (Bootstrap) -->
+        <div class="modal fade" id="modalBuscarProveedor" tabindex="-1" role="dialog" aria-labelledby="modalBuscarProveedorLabel">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="modalBuscarProveedorLabel">
+                            <i class="fa fa-search"></i>Buscar Proveedor
+                </h4>
+                    </div>
+                    <div class="modal-body">
+                        <asp:UpdatePanel ID="UpdatePanel4" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
+                                <div class="form-group">
+                                    <label>Buscar por razón social</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="txtBuscarProv" runat="server"
+                                            placeholder="Ingrese razón social del proveedor" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-primary" type="button"
+                                                runat="server" id="btnBuscar" onserverclick="btnBuscar_click">
+                                                <i class="fa fa-search"></i>Buscar
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="max-height: 350px; overflow-y: auto;">
+                                        <asp:GridView ID="gvProv" runat="server" AutoGenerateColumns="False"
+                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%"
+                                            DataKeyNames="codProveedor,nomProveedor,nroCuit"
+                                            OnRowCommand="gvProv_RowCommand" OnRowCreated="gvProv_RowCreated"
+                                            CssClass="table table-hover table-striped"
+                                            EmptyDataText="No se encontraron proveedores. Realice una búsqueda.">
+                                            <Columns>
+                                                <asp:BoundField DataField="codProveedor" HeaderText="Código">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" Width="80px" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="nomProveedor" HeaderText="Razón Social">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="nroCuit" HeaderText="CUIT">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" Width="120px" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="nroBad" HeaderText="Nro BAD">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" Width="100px" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="Seleccionar">
+                                                    <HeaderStyle BackColor="#5D7B9D" ForeColor="White" Width="100px" />
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="btnSeleccionar" runat="server" CommandName="selected"
+                                                            CssClass="btn btn-sm btn-success"
+                                                            CommandArgument='<%# Container.DataItemIndex %>'
+                                                            CausesValidation="False">
+                                                    <i class="fa fa-check"></i> Seleccionar
+                                                </asp:LinkButton>
+                                                    </ItemTemplate>
+                                                </asp:TemplateField>
+                                            </Columns>
+                                            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                                            <EditRowStyle BackColor="#999999" />
+                                            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                                            <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                                            <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                                        </asp:GridView>
+                                    </div>
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times"></i>Cancelar
+               
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- ////////////////////////////// POPUP DETALLE //////////////////////////////////////// -->
+        <%--//////////// aca va el codigo anterior ////////////--%>
+        <!-- MODAL AGREGAR DETALLE (Bootstrap) -->
+        <div class="modal fade" id="modalAgregarDetalle" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <h4 class="modal-title">
+                            <i class="fa fa-plus-circle"></i>Agregar Items a la Lista
+                </h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- MANTENER el UpdatePanel para AJAX -->
+                        <asp:UpdatePanel ID="UpdatePanel5" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control"
+                                        autocomplete="false" placeholder="Ingrese descripcion del Articulo/Servicio" />
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server"
+                                        ValidationGroup="GroupItems" ControlToValidate="txtDescripcion"
+                                        ErrorMessage="Debe Seleccionar Descripcion del Item" SetFocusOnError="True"
+                                        CssClass="text-danger">*</asp:RequiredFieldValidator>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    <asp:TextBox ID="txtCantidad" runat="server" CssClass="form-control"
+                                        autocomplete="false" placeholder="Ingrese Cantidad" />
+                                    <%-- AutoPostBack="True" OnTextChanged="txtCantidad_TextChanged"--%>
+                                    <asp:CompareValidator ID="CompareValidator2" runat="server"
+                                        ValidationGroup="GroupItems" ControlToValidate="txtCantidad"
+                                        Type="Double" Operator="DataTypeCheck" CssClass="text-danger">*</asp:CompareValidator>
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator5" runat="server"
+                                        ControlToValidate="txtCantidad" ValidationGroup="GroupItems"
+                                        ErrorMessage="Debe ingresar Cantidad" SetFocusOnError="True"
+                                        CssClass="text-danger">*</asp:RequiredFieldValidator>
+                                </div>
+                                <div class="form-group">
+                                    <label>Precio Unitario</label>
+                                    <asp:TextBox ID="txtPU" runat="server" CssClass="form-control"
+                                        placeholder="Precio Unitario" />
+                                    <%--AutoPostBack="True" OnTextChanged="txtPU_TextChanged" --%>
+                                    <asp:CompareValidator ID="CompareValidator3" runat="server"
+                                        ValidationGroup="GroupItems" ControlToValidate="txtPU"
+                                        ErrorMessage="Debe Ingresar Importe"
+                                        Type="Double" Operator="DataTypeCheck" CssClass="text-danger">*</asp:CompareValidator>
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server"
+                                        ControlToValidate="txtPU" ValidationGroup="GroupItems"
+                                        ErrorMessage="Debe ingresar Precio Unitario" SetFocusOnError="True"
+                                        CssClass="text-danger">*</asp:RequiredFieldValidator>
+                                </div>
+                                <asp:ValidationSummary ID="ValidationSummary1" runat="server"
+                                    CssClass="alert alert-danger" ValidationGroup="GroupItems" />
+
+                                <!-- MANTENER también el UpdatePanel2 para los botones -->
+                                <%--<asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                                    <ContentTemplate>
+                                        <div class="form-group text-right">
+                                            <button type="button" class="btn btn-sm"
+                                                runat="server" id="Button2" onserverclick="btnAceptar_Click" validationgroup="GroupItems">
+                                                Aceptar</button>
+                                            <button type="button" class="btn btn-sm"
+                                                runat="server" id="Button1" onserverclick="btnCancelar_Click">
+                                                Salir</button>
+                                        </div>
+                                    </ContentTemplate>
+                                </asp:UpdatePanel>--%>
+                                <!-- Reemplazar todo el bloque de botones dentro del modal -->
+                                <div class="form-group text-right">
+                                    <asp:Button ID="btnItemAceptar" runat="server" Text="Aceptar"
+                                        CssClass="btn btn-success btn-sm"
+                                        ValidationGroup="GroupItems"
+                                        UseSubmitBehavior="false"
+                                        OnClick="btnAceptar_Click" />
+                                    <asp:Button ID="btnItemCancelar" runat="server" Text="Cancelar"
+                                        CssClass="btn btn-default btn-sm"
+                                        CausesValidation="false"
+                                        OnClick="btnCancelar_Click" />
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                        <script>
+                            // Evita doble envío
+                            $(function () {
+                                $('#<%= btnItemAceptar.ClientID %>').on('click', function () {
+                                    if (this.disabled) return false;
+                                    this.disabled = true;
+                                    setTimeout(() => { this.disabled = false; }, 1500);
+                                });
+                            });
+                    </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
 
-        <asp:HiddenField ID="HiddenField2" runat="server" />
+        <%--<asp:HiddenField ID="HiddenField2" runat="server" />
         <asp:Button ID="Button6" runat="server" Text="Button" Style="visibility: hidden;" />
         <ajaxToolkit:ModalPopupExtender runat="server"
             BackgroundCssClass="modalBackground"
@@ -799,10 +866,9 @@
                             Height="106px" TextMode="MultiLine"></asp:TextBox>
                         <br />
                         <br />
-
                         <asp:Button ID="btnAceptarAuditoria" runat="server" Text="Aceptar"
                             CssClass="btn btn-sm"
-                            OnClick="btnAceptarAuditoria_Click" ValidationGroup="GroupDatos"/>
+                            OnClick="btnAceptarAuditoria_Click" ValidationGroup="GroupDatos" />
                         <asp:Button ID="btnCancelarAuditoria" runat="server" Text="Cancelar"
                             CssClass="btn btn-sm"
                             CausesValidation="False" OnClick="btnCancelarAuditoria_Click" />
@@ -813,17 +879,79 @@
                 </asp:UpdatePanel>
             </div>
         </div>
-    </div>
-    <asp:HiddenField ID="HiddenField4" runat="server" />
-    <asp:Button ID="Button7" runat="server" Text="Button" Style="visibility: hidden;" />
-    <ajaxToolkit:ModalPopupExtender runat="server"
+    </div>--%>
+
+        <!-- MODAL AUDITORIA ORDEN DE PEDIDO (Bootstrap) -->
+        <div class="modal fade" id="modalAuditoria" tabindex="-1" role="dialog" aria-labelledby="modalAuditoriaLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #5bc0de; color: white;">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="modalAuditoriaLabel">
+                            <i class="fa fa-clipboard"></i>Auditoria Orden de Pedido
+                </h4>
+                    </div>
+                    <div class="modal-body">
+                        <asp:UpdatePanel ID="uPanelUpdate" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
+                                <div class="form-group">
+                                    <label for="txtObservAuditoria">Motivo de la modificación *</label>
+                                    <asp:TextBox ID="txtObservAuditoria" runat="server"
+                                        CssClass="form-control"
+                                        autocomplete="false"
+                                        placeholder="Ingrese el motivo de la modificacion"
+                                        TextMode="MultiLine"
+                                        Rows="5"
+                                        MaxLength="500"></asp:TextBox>
+                                    <small class="text-muted">Máximo 500 caracteres</small>
+                                </div>
+                                <asp:ValidationSummary ID="ValidationSummary2" runat="server"
+                                    CssClass="alert alert-danger" ValidationGroup="GroupAudita"
+                                    HeaderText="Por favor Ingese datos:"
+                                    DisplayMode="BulletList" />
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                    </div>
+                    <div class="modal-footer text-right">
+                        <%--<asp:Button ID="btnCancelarAuditoria" runat="server" Text="Cancelar"
+                            CssClass="btn btn-sm"
+                            CausesValidation="False" OnClick="btnCancelarAuditoria_Click" />
+                        <asp:Button ID="btnAceptarAuditoria" runat="server" Text="Aceptar"
+                            CssClass="btn btn-sm"
+                            OnClick="btnAceptarAuditoria_Click"
+                            OnClientClick="return validarObservacionAuditoria();"
+                            <i class="fa fa-check"></i>Aceptar
+                        </asp:Button>--%>
+
+                        <asp:LinkButton ID="lnkCancelarAuditoria" runat="server"
+                            CssClass="btn btn-sm"
+                            CausesValidation="False"
+                            OnClick="lnkCancelarAuditoria_Click">
+                            <i class="fa fa-times"></i> Cancelar
+                        </asp:LinkButton>
+                        <asp:LinkButton ID="lnkAceptarAuditoria" runat="server"
+                            CssClass="btn btn-sm"
+                            OnClick="lnkAceptarAuditoria_Click"
+                            OnClientClick="return validarObservacionAuditoria();">
+                            <i class="fa fa-check"></i> Aceptar
+                        </asp:LinkButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%-- <asp:HiddenField ID="HiddenField4" runat="server" />
+        <asp:Button ID="Button7" runat="server" Text="Button" Style="visibility: hidden;" />
+        <ajaxToolkit:ModalPopupExtender runat="server"
         BackgroundCssClass="modalBackground"
         PopupControlID="modalReporte"
         BehaviorID="popUpListado"
         TargetControlID="Button7"
         ID="popUpListado">
-    </ajaxToolkit:ModalPopupExtender>
-    <div class="row" id="modalReporte" style="background-color: White; width: 70%; padding: 15px; border-radius: 12px; padding-top: 0px;">
+        </ajaxToolkit:ModalPopupExtender>
+        <div class="row" id="modalReporte" style="background-color: White; width: 70%; padding: 15px; border-radius: 12px; padding-top: 0px;">
         <asp:UpdatePanel ID="UpdatePanel7" runat="server">
             <ContentTemplate>
                 <div class="row">
@@ -838,9 +966,104 @@
                 </div>
             </ContentTemplate>
         </asp:UpdatePanel>
-    </div>
+        </div>--%>
+        <!-- ///////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- MODAL REPORTE ORDEN DE PEDIDO (Bootstrap) -->
+        <div class="modal fade" id="modalReporteOP" tabindex="-1" role="dialog" aria-labelledby="modalReporteOPLabel">
+            <div class="modal-dialog modal-lg" role="document" style="width: 90%; max-width: 1200px;">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #3587B2; color: white;">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="modalReporteOPLabel">
+                            <i class="fa fa-file-pdf-o"></i>Reporte Orden de Pedido
+                </h4>
+                    </div>
+                    <div class="modal-body" style="padding: 0; height: 70vh;">
+                        <asp:UpdatePanel ID="UpdatePanel7" runat="server">
+                            <ContentTemplate>
+                                <div runat="server" id="divReporte"
+                                    style="width: 100%; height: 100%; min-height: 600px;">
+                                </div>
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            <i class="fa fa-times"></i>Cerrar
+               
+                        </button>
+                        <%--<button type="button" class="btn btn-primary" onclick="window.print();">
+                            <i class="fa fa-print"></i>Imprimir
+               
+                        </button>--%>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL SUBIR EXCEL -->
+        <div class="modal fade" id="modalSubirExcel" tabindex="-1" role="dialog" aria-labelledby="modalSubirExcelLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="modalSubirExcelLabel">
+                            <i class="fa fa-file-excel-o"></i>Subir Archivo Excel
+                </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Seleccione el archivo Excel (.xlsx, .xls)</label>
+                            <asp:FileUpload ID="fuExcel" runat="server" CssClass="form-control"
+                                accept=".xlsx,.xls" />
+                            <small class="text-muted">Formatos permitidos: .xlsx, .xls (Máximo 5MB)</small>
+                        </div>
+                        <div class="form-group">
+                            <div class="alert alert-info">
+                                <strong>Por favor, Leer !!!</strong>
+                                <strong>Formato esperado del Excel:</strong>
+                                <ul>
+                                    <li>Columna A: Descripción del artículo/servicio</li>
+                                    <li>Columna B: Cantidad</li>
+                                    <li>Columna C: Precio Unitario</li>
+                                </ul>
+                                <p><small>La primera fila debe contener los encabezados</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <asp:Button ID="btnProcesarExcel" runat="server" Text="Subir y Procesar"
+                            CssClass="btn btn-primary" OnClick="btnProcesarExcel_Click" />
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
+        <script type="text/javascript">
 
+            function validarObservacionAuditoria() {
+                var txtObs = document.getElementById('<%= txtObservAuditoria.ClientID %>');
+                var observacion = txtObs.value.trim();
 
+                if (observacion === '') {
+                    alert('Debe ingresar el motivo de la modificación');
+                    txtObs.focus();
+                    return false; // Cancela el postback
+                }
+
+                if (observacion.length < 10) {
+                    alert('El motivo debe tener al menos 10 caracteres');
+                    txtObs.focus();
+                    return false;
+                }
+
+                return true; // Permite el postback
+            }
+        </script>
 </asp:Content>

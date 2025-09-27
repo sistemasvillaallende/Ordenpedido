@@ -6,15 +6,23 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Entities;
+using DAL;
+using System.Web.Services.Description;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Math;
+
+
 namespace Web.Secure
 {
     public partial class newOpBootstrap : System.Web.UI.Page
     {
         List<Entities.DetalleOrden> lstDetalle = new List<DetalleOrden>();
         Entities.OrdenPedido oOp = new Entities.OrdenPedido();
-
         WSAFIP.WSAFIPSoapClient WSAfip = new WSAFIP.WSAFIPSoapClient();
+        // Agrega este campo protegido a la clase newOpBootstrap para que el control FileUpload esté disponible en el code-behind.
+        // Debe coincidir con el ID del control FileUpload en el archivo .aspx (por ejemplo: <asp:FileUpload ID="fuExcel" ... />).
 
+        protected FileUpload fuExcel;
         private List<DAL.FACTURA_X_ORDEN_PEDIDO> leerGrillaFacturas()
         {
             List<DAL.FACTURA_X_ORDEN_PEDIDO> lst = new List<DAL.FACTURA_X_ORDEN_PEDIDO>();
@@ -23,8 +31,7 @@ namespace Web.Secure
                 GridViewRow row = gvFacturas.Rows[i];
                 DAL.FACTURA_X_ORDEN_PEDIDO obj = new DAL.FACTURA_X_ORDEN_PEDIDO();
                 obj.ID = int.Parse(gvFacturas.DataKeys[i].Values["ID"].ToString());
-                obj.FECHA_EMISION = Convert.ToDateTime(
-                    gvFacturas.DataKeys[i].Values["FECHA_EMISION"].ToString());
+                obj.FECHA_EMISION = Convert.ToDateTime(gvFacturas.DataKeys[i].Values["FECHA_EMISION"].ToString());
                 obj.PUNTO_VENTA = Convert.ToInt32(gvFacturas.DataKeys[i].Values["PUNTO_VENTA"].ToString());
                 obj.NRO_COMPROBANTE = Convert.ToInt64(gvFacturas.DataKeys[i].Values["NRO_COMPROBANTE"]);
                 obj.NRO_CAE = Int64.Parse(gvFacturas.DataKeys[i].Values["NRO_CAE"].ToString());
@@ -46,49 +53,140 @@ namespace Web.Secure
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Request.Cookies["UserOP"] == null)
-            {   // La cookie no existe
-                Response.Redirect("../Login.aspx");
-            }
-            //
+            if (!ValidarCookieUsuario())
+                return;
+            Entities.OrdenPedido ordenPedido = null;
             if (!IsPostBack)
             {
-                fillFacturas(new List<DAL.FACTURA_X_ORDEN_PEDIDO>());
-                fillDetalle(new List<DetalleOrden>());
-                btnPrint.Visible = false;
-                btnAddOrden.Visible = false;
-                txtFechaOp.InnerHtml = BLL.OrdenPedidoBLL.FechaServer();
-                //DateTime.Now.ToString();
-                if (Request.Cookies["UserOP"]["id_oficina_usuario"] != null)
-                {
-                    P1.InnerText = Request.Cookies["UserOP"]["id_oficina_usuario"].ToString() + " - " +
-                    BLL.OficinasBLL.getOficinaByPk(Convert.ToInt32(
-                        Request.Cookies["UserOP"]["id_oficina_usuario"])).nombre;
-                }
-                Session.Add("Detalle", lstDetalle);
-                Session.Add("Total", 0);
-                Session.Add("opcion", 0);
-                Session.Add("index", 0);
-                Session.Add("ordenPedido", null);
-                Session.Add("nroOrden", 0);
-                if (Request.QueryString["op"] != null)
-                {
-                    int op = int.Parse(Request.QueryString["op"]);
-                    if (op != 0)
-                    {
-                        fillDatos(BLL.OrdenPedidoBLL.getOrdenesByPk(op));
-                    }
-                }
-                txtIdProv.Focus();
+                InicializarControles();
+                CargarDatosUsuario();
+                InicializarSesiones();
+                CargarDesplegables();
+                ordenPedido = CargarOrdenDesdeQuery();
                 DDLTipoComprobante.SelectedIndex = 5;
+                txtIdProv.Focus();
+            }
+            txtEstado_op.InnerHtml = ordenPedido != null
+                ? GetEstadoOPDescripcion(ordenPedido.codEstadoOP)
+                : "Sin estado";
+        }
 
+        private bool ValidarCookieUsuario()
+        {
+            var cookie = Request.Cookies["UserOP"];
+            if (cookie == null)
+            {
+                Response.Redirect("../Login.aspx");
+                return false;
+            }
+            return true;
+        }
 
+        private void InicializarControles()
+        {
+            fillFacturas(new List<DAL.FACTURA_X_ORDEN_PEDIDO>());
+            fillDetalle(new List<DetalleOrden>());
+            btnPrint.Visible = false;
+            btnAddOrden.Visible = false;
+            txtFechaOp.InnerHtml = BLL.OrdenPedidoBLL.FechaServer();
+        }
+
+        private void CargarDatosUsuario()
+        {
+            var cookie = Request.Cookies["UserOP"];
+            if (cookie != null && !string.IsNullOrEmpty(cookie["id_oficina_usuario"]))
+            {
+                int idOficina = Convert.ToInt32(cookie["id_oficina_usuario"]);
+                var oficina = BLL.OficinasBLL.getOficinaByPk(idOficina);
+                P1.InnerText = $"{idOficina} - {oficina.nombre}";
             }
         }
 
+        private void InicializarSesiones()
+        {
+            Session["Detalle"] = lstDetalle;
+            Session["Total"] = 0;
+            Session["opcion"] = 0;
+            Session["index"] = 0;
+            Session["ordenPedido"] = null;
+            Session["nroOrden"] = 0;
+        }
+
+        private Entities.OrdenPedido CargarOrdenDesdeQuery()
+        {
+            if (int.TryParse(Request.QueryString["op"], out int op) && op != 0)
+            {
+                var objOP = BLL.OrdenPedidoBLL.getOrdenesByPk(op);
+                fillDatos(objOP);
+                return objOP;
+            }
+            return null;
+        }
+
+        private static string GetEstadoOPDescripcion(int codEstadoOp)
+        {
+            switch (codEstadoOp)
+            {
+                case 1:
+                    return "Recibida";
+                case 2:
+                    return "Devuelta";
+                default:
+                    return "Sin Estado";
+            }
+        }
+
+        private void CargarDesplegables()
+        {
+            ddlSecretariaAutoriza.DataTextField = "descripcion";
+            ddlSecretariaAutoriza.DataValueField = "id_secretaria";
+            ddlSecretariaAutoriza.DataSource = DAL.DesplegablesDAL.GetSecretarias(0);
+            ddlSecretariaAutoriza.DataBind();
+            ddlSecretariaAutoriza.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+            ddlDireccionSolicitante.Items.Clear();
+            ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+
+            //ddlDireccionSolicitante.DataTextField = "descripcion";
+            //ddlDireccionSolicitante.DataValueField = "id_direccion";
+            //ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(0);
+            //ddlDireccionSolicitante.DataBind();
+            //ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+        }
+
+        protected void ddlSecretariaAutoriza_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int id = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
+            ddlDireccionSolicitante.Items.Clear();
+            ddlDireccionSolicitante.DataTextField = "descripcion";
+            ddlDireccionSolicitante.DataValueField = "id_direccion";
+            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(id);
+            ddlDireccionSolicitante.DataBind();
+            // Copiar el texto seleccionado en ddlSecretariaAutoriza al campo solicitante
+            txtAut.Value = ddlSecretariaAutoriza.SelectedItem.Text;
+            txtSolicitante.Value = string.Empty;
+            UPanelDatos.Update();
+        }
+
+        protected void ddlDireccionSolicitante_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Copiar el texto seleccionado en ddlDireccionSolicitante al campo aprobado
+            txtSolicitante.Value = ddlDireccionSolicitante.SelectedItem.Text;
+            UPanelDatos.Update();
+        }
+
+        private void CargarDesplegables(Entities.OrdenPedido obj)
+        {
+            int idsec = (int)obj.cod_secretaria_autoriza;
+            ddlDireccionSolicitante.Items.Clear();
+            ddlDireccionSolicitante.DataTextField = "descripcion";
+            ddlDireccionSolicitante.DataValueField = "id_direccion";
+            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(idsec);
+            ddlDireccionSolicitante.DataBind();
+        }
 
         protected void fillDatos(Entities.OrdenPedido oOp)
         {
+            CargarDesplegables(oOp);
             txtOP.InnerText = oOp.nroOrden.ToString();
             txtFechaOp.InnerText = oOp.fechaOrden.ToShortDateString();
             txtIdProv.Text = oOp.codProveedor.ToString();
@@ -102,15 +200,15 @@ namespace Web.Secure
             txtNameDestino.Value = oOp.destino;
             txtObs.Value = oOp.obs;
             txtFormaPago.Value = oOp.formaPago;
-            txtNroPresup.Value = oOp.nroPresupuesto;
             txtNroFactura.Value = oOp.nroFacturas;
+            ddlSecretariaAutoriza.SelectedValue = (oOp.cod_secretaria_autoriza.HasValue) ? oOp.cod_secretaria_autoriza.Value.ToString() : "0";
+            ddlDireccionSolicitante.SelectedValue = (oOp.cod_direccion_solicita.HasValue) ? oOp.cod_direccion_solicita.Value.ToString() : "0";
             fillDetalle(oOp.detalle);
             decimal total = 0;
             for (int i = 0; i < oOp.detalle.Count; i++)
             {
                 total += decimal.Round(oOp.detalle[i].importe, 2);
             }
-
             List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas = DAL.FACTURA_X_ORDEN_PEDIDO.read(oOp.nroOrden);
             fillFacturas(lstFacturas);
             lblTotal.InnerText = "$" + total.ToString();
@@ -127,7 +225,6 @@ namespace Web.Secure
         //TEXTOS ID Y NOMBRE PROVEEDOR                                                                   
         protected void gvProv_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            int i = int.Parse(e.CommandArgument.ToString());
             if (e.CommandName == "selected")
             {
                 int index = Convert.ToInt32(e.CommandArgument);
@@ -135,12 +232,20 @@ namespace Web.Secure
                 txtIdProv.Text = gvProv.DataKeys[index].Values["codProveedor"].ToString();
                 txtCUITProveedor.Value = (string)(gvProv.DataKeys[index].Values["nroCuit"]);
                 txtCUIT.Text = (string)(gvProv.DataKeys[index].Values["nroCuit"]);
-                popUpProveedor.Hide();
+
+                // Limpiar grilla y campo de búsqueda
                 gvProv.DataSource = null;
-                DataBind();
+                gvProv.DataBind();
                 txtBuscarProv.Value = string.Empty;
+
+                // Actualizar paneles
+                UpdatePanel4.Update();
                 uPanelProv.Update();
                 UPanelDatos.Update();
+
+                // Cerrar modal Bootstrap
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                    "$('#modalBuscarProveedor').modal('hide');", true);
             }
         }
 
@@ -148,12 +253,10 @@ namespace Web.Secure
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
-                ImageButton imgbtn;
-
-                imgbtn = (ImageButton)e.Row.FindControl("imgbSeleccionar");
-                if (imgbtn != null)
+                LinkButton btnSeleccionar = (LinkButton)e.Row.FindControl("btnSeleccionar");
+                if (btnSeleccionar != null)
                 {
-                    imgbtn.CommandArgument = e.Row.RowIndex.ToString();
+                    btnSeleccionar.CommandArgument = e.Row.RowIndex.ToString();
                 }
             }
         }
@@ -165,11 +268,18 @@ namespace Web.Secure
         //BOTON QUE ABRE EL POPUP BUSCAR PROVEEDOR////////////////////////
         protected void btnFindProv_click(object sender, EventArgs e)
         {
+            // Limpiar la grilla
+            gvProv.DataSource = null;
+            gvProv.DataBind();
+            txtBuscarProv.Value = string.Empty;
+
             UpdatePanel4.Update();
             txtBuscarProv.Focus();
-            popUpProveedor.Show();
+
+            // El modal se abre desde JavaScript (OnClientClick del LinkButton)
+            // Este método solo prepara los campos
         }
-        
+
         //METODO QUE CARGA LA GRILLA DE PROVEEDORES///////////////////////////////////////////////////
         protected void fillProveedores(string nombre)
         {
@@ -178,22 +288,34 @@ namespace Web.Secure
             gvProv.DataBind();
         }
 
-
         protected void btnCancelProv_click(object sender, EventArgs e)
         {
-            popUpProveedor.Dispose();
-            popUpProveedor.Hide();
+            // Cerrar modal Bootstrap
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                "$('#modalBuscarProveedor').modal('hide');", true);
         }
 
+
+        //protected void btnFindDest_click(object sender, EventArgs e)
+        //{
+        //    // Limpiar la grilla
+        //    gvOficinas.DataSource = null;
+        //    gvOficinas.DataBind();
+        //    txtFindDest.Value = string.Empty;
+
+        //    UpdatePanel3.Update();
+        //    txtFindDest.Focus();
+
+        //    // El modal se abre desde JavaScript (OnClientClick del LinkButton)
+        //    // Este método solo prepara los campos
+        //}
 
         protected void btnFindDest_click(object sender, EventArgs e)
         {
             UpdatePanel3.Update();
             txtFindDest.Focus();
-            popUpOficina.Show();
+            //popUpOficina.Show();
         }
-
-
         protected void btnBuscarDest_click(object sender, EventArgs e)
         {
             fillOficinas(txtFindDest.Value);
@@ -208,19 +330,24 @@ namespace Web.Secure
 
         protected void gvOficinas_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            int i = int.Parse(e.CommandArgument.ToString());
             if (e.CommandName == "selected")
             {
                 int index = Convert.ToInt32(e.CommandArgument);
                 txtNameDestino.Value = gvOficinas.DataKeys[index].Values["nombre"].ToString();
                 txtIdDestino.Text = gvOficinas.DataKeys[index].Values["idOficina"].ToString();
-                popUpOficina.Dispose();
-                popUpOficina.Hide();
+
+                // Limpiar grilla y campo de búsqueda
                 gvOficinas.DataSource = null;
                 gvOficinas.DataBind();
                 txtFindDest.Value = string.Empty;
+
+                // Actualizar paneles
                 UpdatePanel3.Update();
                 UPanelDestino.Update();
+
+                // Cerrar modal Bootstrap
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                    "$('#modalBuscarOficina').modal('hide');", true);
             }
         }
 
@@ -228,26 +355,28 @@ namespace Web.Secure
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
-                ImageButton imgbtn;
-
-                imgbtn = (ImageButton)e.Row.FindControl("imgbSeleccionar");
-                if (imgbtn != null)
+                LinkButton btnSeleccionar = (LinkButton)e.Row.FindControl("btnSeleccionar");
+                if (btnSeleccionar != null)
                 {
-                    imgbtn.CommandArgument = e.Row.RowIndex.ToString();
+                    btnSeleccionar.CommandArgument = e.Row.RowIndex.ToString();
                 }
             }
         }
 
         protected void btnCancelDest_click(object sender, EventArgs e)
         {
-            popUpOficina.Dispose();
-            popUpOficina.Hide();
+            // Cerrar modal Bootstrap
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                "$('#modalBuscarOficina').modal('hide');", true);
+            //popUpOficina.Dispose();
+            //popUpOficina.Hide();
+
         }
 
         protected void btnAddDetalle_click(object sender, EventArgs e)
         {
             CleanCamposDetalle();
-            popUpDetalle.Show();
+            //popUpDetalle.Show();
         }
 
         protected void CleanCamposDetalle()
@@ -315,7 +444,7 @@ namespace Web.Secure
                 else
                 {
                     string script = @"<script type='text/javascript'> 
-            apprise('El numero ingresado no corresponde a una Oficina',{'animate':true}); </script>";
+                        apprise('El numero ingresado no corresponde a una Oficina',{'animate':true}); </script>";
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
                     txtIdDestino.Text = string.Empty;
                     txtNameDestino.Value = string.Empty;
@@ -356,7 +485,10 @@ namespace Web.Secure
                 Session["opcion"] = 1;
                 Session["index"] = index;
                 UpdatePanel5.Update();
-                popUpDetalle.Show();
+                //popUpDetalle.Show();
+                // Abrir el modal Bootstrap para editar
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "openModal",
+                    "$('#modalAgregarDetalle').modal('show');", true);
             }
         }
 
@@ -380,94 +512,199 @@ namespace Web.Secure
             }
         }
 
-        protected void txtCantidad_TextChanged(object sender, EventArgs e)
-        {
-            /* try
-            {
-              string pu = txtCantidad.Text;
-              txtCantidad.Text = pu.Replace(".", ",");
-              decimal can = decimal.Parse(txtCantidad.Text);
-            }
-            catch
-            {
-              string script = @"<script type='text/javascript'> 
-              apprise('Tipo de dato Incorrecto',{'animate':true}); </script>";
-              ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
-              txtCantidad.Text = string.Empty;
-              txtCantidad.Focus();
-            }*/
-            txtPU.Focus();
-        }
+        //protected void txtCantidad_TextChanged(object sender, EventArgs e)
+        //{
+        //    /* try
+        //    {
+        //      string pu = txtCantidad.Text;
+        //      txtCantidad.Text = pu.Replace(".", ",");
+        //      decimal can = decimal.Parse(txtCantidad.Text);
+        //    }
+        //    catch
+        //    {
+        //      string script = @"<script type='text/javascript'> 
+        //      apprise('Tipo de dato Incorrecto',{'animate':true}); </script>";
+        //      ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
+        //      txtCantidad.Text = string.Empty;
+        //      txtCantidad.Focus();
+        //    }*/
+        //    txtPU.Focus();
+        //}
 
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
-            popUpDetalle.Hide();
-            Button1.Focus();
+            //popUpDetalle.Hide();
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                "$('#modalAgregarDetalle').modal('hide');", true);
+            //Button1.Focus();
         }
 
-        protected void txtPU_TextChanged(object sender, EventArgs e)
-        {
-            /*try
-            {
-              string pu = txtPU.Text;
-              txtPU.Text = pu.Replace(".", ",");
-              decimal can = decimal.Parse(txtPU.Text);
-            }
-            catch
-            {
-              string script =@"<script type='text/javascript'> apprise('Tipo de dato Incorrecto',{'animate':true}); </script>";
-              ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
-              txtPU.Text = string.Empty;
-              txtPU.Focus();
-            }*/
-            Button2.Focus();
-        }
+        //protected void txtPU_TextChanged(object sender, EventArgs e)
+        //{
+        //    /*try
+        //    {
+        //      string pu = txtPU.Text;
+        //      txtPU.Text = pu.Replace(".", ",");
+        //      decimal can = decimal.Parse(txtPU.Text);
+        //    }
+        //    catch
+        //    {
+        //      string script =@"<script type='text/javascript'> apprise('Tipo de dato Incorrecto',{'animate':true}); </script>";
+        //      ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
+        //      txtPU.Text = string.Empty;
+        //      txtPU.Focus();
+        //    }*/
+        //    //Button2.Focus();
+        //}
+
+        //protected void btnAceptar_Click(object sender, EventArgs e)
+        //{
+        //    if (txtCantidad.Text.Trim() == string.Empty ||
+        //        txtDescripcion.Text.Trim() == string.Empty || txtPU.Text == string.Empty)
+        //    {
+        //        string script =
+        //        @"<script type='text/javascript'> apprise('Complete los datos Solicitados',{'animate':true}); </script>";
+        //        ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
+        //    }
+        //    else
+        //    {
+        //        lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
+
+        //        // Validar que la lista no sea nula
+        //        if (lstDetalle == null)
+        //        {
+        //            lstDetalle = new List<Entities.DetalleOrden>();
+        //        }
+
+
+        //        Entities.DetalleOrden detalle = new DetalleOrden();
+        //        detalle.descItems = txtDescripcion.Text;
+        //        detalle.cant = Convert.ToDecimal(txtCantidad.Text);
+        //        detalle.precio = Convert.ToDecimal(txtPU.Text);
+        //        detalle.importe = decimal.Round((detalle.precio * detalle.cant), 2);
+
+        //        if ((int)Session["opcion"] == 0)
+        //            lstDetalle.Add(detalle);
+        //        else
+        //        {
+        //            lstDetalle[(int)Session["index"]].descItems = detalle.descItems;
+        //            lstDetalle[(int)Session["index"]].cant = detalle.cant;
+        //            lstDetalle[(int)Session["index"]].precio = detalle.precio;
+        //            lstDetalle[(int)Session["index"]].importe = detalle.importe;
+        //        }
+        //        decimal total = 0;
+        //        foreach (DetalleOrden det in lstDetalle)
+        //        {
+        //            total += det.importe;
+        //        }
+        //        Session["Detalle"] = lstDetalle;
+        //        Session["Total"] = total;
+        //        Session["opcion"] = 0;
+
+        //        lblTotal.InnerText = "TOTAL: $" + total.ToString();
+        //        fillDetalle(lstDetalle);
+        //        CleanCamposDetalle();
+        //        //txtDescripcion.Focus();
+        //        //popUpDetalle.Show();
+        //        // Cerrar el modal Bootstrap
+        //        ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+        //            "$('#modalAgregarDetalle').modal('hide');", true);
+
+        //        // Mostrar mensaje de éxito
+        //        ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
+        //            "alert('Item agregado correctamente');", true);
+        //    }
+        //}
 
         protected void btnAceptar_Click(object sender, EventArgs e)
         {
-            if (txtCantidad.Text.Trim() == string.Empty ||
-                txtDescripcion.Text.Trim() == string.Empty || txtPU.Text == string.Empty)
+            // Forzar validación explícita
+            if (!Page.IsValid)
             {
-                string script =
-                @"<script type='text/javascript'> apprise('Complete los datos Solicitados',{'animate':true}); </script>";
-                ScriptManager.RegisterStartupScript(this, typeof(Page), "alerta", script, false);
+                return;
             }
-            else
-            {
-                lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
-                Entities.DetalleOrden detalle = new DetalleOrden();
-                detalle.descItems = txtDescripcion.Text;
-                detalle.cant = Convert.ToDecimal(txtCantidad.Text);
-                detalle.precio = Convert.ToDecimal(txtPU.Text);
-                detalle.importe = decimal.Round((detalle.precio * detalle.cant), 2);
 
-                if ((int)Session["opcion"] == 0)
-                    lstDetalle.Add(detalle);
+            // Verificar campos manualmente también
+            if (string.IsNullOrWhiteSpace(txtDescripcion.Text) ||
+                string.IsNullOrWhiteSpace(txtCantidad.Text) ||
+                string.IsNullOrWhiteSpace(txtPU.Text))
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    "alert('Complete todos los campos obligatorios');", true);
+                return;
+            }
+
+            // Validar tipos de datos
+            if (!decimal.TryParse(txtCantidad.Text, out decimal cantidad) || cantidad <= 0)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    "alert('Ingrese una cantidad válida mayor a 0');", true);
+                return;
+            }
+
+            if (!decimal.TryParse(txtPU.Text, out decimal precio) || precio <= 0)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    "alert('Ingrese un precio válido mayor a 0');", true);
+                return;
+            }
+
+            try
+            {
+                lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"] ?? new List<Entities.DetalleOrden>();
+
+                Entities.DetalleOrden detalle = new DetalleOrden();
+                detalle.descItems = txtDescripcion.Text.Trim();
+                detalle.cant = cantidad;
+                detalle.precio = precio;
+                detalle.importe = decimal.Round((precio * cantidad), 2);
+
+                if ((int?)Session["opcion"] == 1)
+                {
+                    int index = (int)Session["index"];
+                    lstDetalle[index] = detalle;
+                }
                 else
                 {
-                    lstDetalle[(int)Session["index"]].descItems = detalle.descItems;
-                    lstDetalle[(int)Session["index"]].cant = detalle.cant;
-                    lstDetalle[(int)Session["index"]].precio = detalle.precio;
-                    lstDetalle[(int)Session["index"]].importe = detalle.importe;
+                    lstDetalle.Add(detalle);
                 }
-                decimal total = 0;
-                foreach (DetalleOrden det in lstDetalle)
-                {
-                    total += det.importe;
-                }
+
+                decimal total = lstDetalle.Sum(det => det.importe);
+
                 Session["Detalle"] = lstDetalle;
                 Session["Total"] = total;
                 Session["opcion"] = 0;
+                Session["index"] = -1;
 
-                lblTotal.InnerText = "TOTAL: $" + total.ToString();
+                lblTotal.InnerText = "TOTAL: $" + total.ToString("N2");
                 fillDetalle(lstDetalle);
                 CleanCamposDetalle();
-                txtDescripcion.Focus();
-                popUpDetalle.Show();
+
+                ////  // Cerrar modal y mostrar mensaje
+                ////  ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModalSuccess",
+                ////      @"$('#modalAgregarDetalle').modal('hide'); 
+                ////           setTimeout(function() { 
+                ////    alert('Item agregado correctamente'); 
+                ////}, 300);", true);
+                ///
+
+                // SIEMPRE mantener modal abierto y enfocar
+                string script = $@"
+                        $('#{txtDescripcion.ClientID}').focus(); 
+                         // Opcional: highlight temporal del modal
+                        $('.modal-content').addClass('border-success');
+                        setTimeout(function() {{
+                            $('.modal-content').removeClass('border-success');
+                        }}, 1000);";
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "keepModalOpen", script, true);
 
             }
+            catch (Exception ex)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    $"alert('Error al agregar item: {ex.Message}');", true);
+            }
         }
-
         protected void fillDetalle(List<Entities.DetalleOrden> lstDetalle)
         {
             gvDetalle.DataSource = lstDetalle;
@@ -491,12 +728,8 @@ namespace Web.Secure
             //
             oOrden.anulado = false;
             //
-            if (txtAut.Value.Trim().ToUpper() != string.Empty)
-                oOrden.aprobado = txtAut.Value.Trim().ToUpper();
-
             if (txtIdDestino.Text != string.Empty)
                 oOrden.codOficinaDestino = int.Parse(txtIdDestino.Text);
-
 
             oOrden.codOficinaOrigen = int.Parse(Request.Cookies["UserOP"]["id_oficina_usuario"].ToString());
             if (txtIdProv.Text != string.Empty)
@@ -514,23 +747,25 @@ namespace Web.Secure
             if (txtFormaPago.Value.Trim().ToUpper() != string.Empty)
                 oOrden.formaPago = txtFormaPago.Value.Trim().ToUpper();
 
-
             if (txtNroPresup.Value.Trim().ToUpper() != string.Empty)
                 oOrden.nroPresupuesto = txtNroPresup.Value.Trim().ToUpper();
-
             //NRO FACTURA                                                                                               
             if (txtNroFactura.Value.Trim().ToUpper() != string.Empty)
                 oOrden.nroFacturas = txtNroFactura.Value.Trim().ToUpper();
-
-            //SOLICITANTE                                                                                               
+            //SOLICITANTE                                                                                              
             if (txtSolicitante.Value.Trim().ToUpper() != string.Empty)
                 oOrden.solicitante = txtSolicitante.Value.Trim().ToUpper();
-
+            //AUTORIZANTE Aprobado
+            if (txtAut.Value.Trim().ToUpper() != string.Empty)
+                oOrden.aprobado = txtAut.Value.Trim().ToUpper();
             if (txtObs.Value.Trim().ToUpper() != string.Empty)
                 oOrden.obs = txtObs.Value.Trim().ToUpper();
             else
                 oOp.obs = string.Empty;
-
+            //
+            oOrden.cod_secretaria_autoriza = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
+            oOrden.cod_direccion_solicita = Convert.ToInt32(ddlDireccionSolicitante.SelectedValue);
+            //
             List<Entities.DetalleOrden> lstDetalle;
             lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
 
@@ -578,7 +813,7 @@ namespace Web.Secure
                 {
                     divConsultaError.Visible = true;
                     HtmlGenericControl li = new HtmlGenericControl();
-                    li.InnerText = "El importe total de facturas no coinside con el importe total cargado en el detalle";
+                    li.InnerText = "El importe total de facturas no coincide con el importe total cargado en el detalle";
                     ulErrores.Controls.Add(li);
                     UPanelDatos.Update();
                     return;
@@ -597,9 +832,16 @@ namespace Web.Secure
             }
             else
             {
+                //Session["ordenPedido"] = oOrden;
+                //txtObservAuditoria.Focus();
+                //popUpAuditoria.Show();
                 Session["ordenPedido"] = oOrden;
                 txtObservAuditoria.Focus();
-                popUpAuditoria.Show();
+
+                // Cambiar popUpAuditoria.Show() por:
+                uPanelUpdate.Update();
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "showAuditModal",
+                    "$('#modalAuditoria').modal('show');", true);
             }
             btnPrint.Visible = true;
             btnAddOrden.Visible = true;
@@ -607,26 +849,55 @@ namespace Web.Secure
             txtOP.InnerText = oOrden.nroOrden.ToString();
         }
 
+
+
+
+        //<a target = "_blank" href="../Reportes/ReporteOrdenPedido.aspx?nroOrden=<%#Eval("nroOrden")%>">
+        //                                <span class="fa fa-print" style="font-size: 20px;"></span>
+        //                            </a>
+
+
+        //protected void btnPrint_Click(object sender, EventArgs e)
+        //{
+        //    Entities.OrdenPedido objOrden = (Entities.OrdenPedido)Session["ordenPedido"];
+        //    int cod = objOrden.nroOrden;
+        //    Session["ordenPedido"] = BLL.OrdenPedidoBLL.getOrdenesByPk(cod);
+        //    divReporte.InnerHtml = "<iframe src=\" " +
+        //        string.Format("../Reportes/ReporteOrdenPedido.aspx?nroOrden_pedido={0}", cod) + "\"  width=\"100%\" height=\"600\"></iframe>";
+        //    popUpListado.Show();
+        //}
+        ////string.Format("../impresiones/consultaexpedientes.aspx?fecha_desde={0}&fecha_hasta={1}&cod_desde={2}&cod_hasta={3}&tipo={4}&agrupado={5}",
+        ////   txtFecha_desde.Text, txtFecha_hasta.Text, cod_desde, cod_hasta, "estado", agrupado) + "\"  width=\"100%\" height=\"600\"></iframe>";
+        ////  popUpListado.Show();
+
         protected void btnPrint_Click(object sender, EventArgs e)
         {
             Entities.OrdenPedido objOrden = (Entities.OrdenPedido)Session["ordenPedido"];
             int cod = objOrden.nroOrden;
             Session["ordenPedido"] = BLL.OrdenPedidoBLL.getOrdenesByPk(cod);
-            //string script = "window.open('printOp.aspx','Orden de Pedido', 'width=700,height=600,scrollbars=NO');";
-            //ScriptManager.RegisterStartupScript(this, typeof(Page), "popup", script, true);
 
-            divReporte.InnerHtml = "<iframe src=\" " +
-             string.Format("../reportes/print.aspx?nroOrden_pedido={0}", cod) + "\"  width=\"100%\" height=\"600\"></iframe>";
-            popUpListado.Show();
+            divReporte.InnerHtml = "<iframe src=\"" +
+                string.Format("../Reportes/ReporteOrdenPedido.aspx?nroOrden_pedido={0}", cod) +
+                "\" width=\"100%\" height=\"600\" style=\"border: none;\"></iframe>";
+
+            // Actualizar el UpdatePanel
+            //UpdatePanel7.Update();
+
+            // Abrir modal Bootstrap
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "openReportModal",
+                "$('#modalReporteOP').modal('show');", true);
         }
-        //string.Format("../impresiones/consultaexpedientes.aspx?fecha_desde={0}&fecha_hasta={1}&cod_desde={2}&cod_hasta={3}&tipo={4}&agrupado={5}",
-        //   txtFecha_desde.Text, txtFecha_hasta.Text, cod_desde, cod_hasta, "estado", agrupado) + "\"  width=\"100%\" height=\"600\"></iframe>";
-        //  popUpListado.Show();
 
         protected void btnCloseListado_Click(object sender, EventArgs e)
         {
-            popUpListado.Hide();
+            // Cerrar modal Bootstrap
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "closeReportModal",
+                "$('#modalReporteOP').modal('hide');", true);
         }
+        //protected void btnCloseListado_Click(object sender, EventArgs e)
+        //{
+        //    popUpListado.Hide();
+        //}
 
 
         protected void btnAddOrden_click(object sender, EventArgs e)
@@ -636,7 +907,7 @@ namespace Web.Secure
             btnExit.Visible = true;                                                         //
             btnPrint.Visible = false;                                                       //
             btnAddOrden.Visible = false;                                                    //
-                                                                                            //txtFechaOp.InnerText = DateTime.Now.ToShortDateString();                      
+            //txtFechaOp.InnerText = DateTime.Now.ToShortDateString();                      
             txtFechaOp.InnerText = BLL.OrdenPedidoBLL.FechaServer();
             if (Request.Cookies["UserOP"]["id_oficina_usuario"] != null)
             {
@@ -667,59 +938,26 @@ namespace Web.Secure
 
         protected void lbtnAddDetalle_Click(object sender, EventArgs e)
         {
-            txtDescripcion.Text = string.Empty;
-            txtCantidad.Text = string.Empty;
-            txtPU.Text = string.Empty;
-            UpdatePanel5.Update();
-            txtDescripcion.Focus();
-            popUpDetalle.Show();
+            //txtDescripcion.Text = string.Empty;
+            //txtCantidad.Text = string.Empty;
+            //txtPU.Text = string.Empty;
+            //UpdatePanel5.Update();
+            //txtDescripcion.Focus();
+            // Limpiar campos para nuevo item
+            CleanCamposDetalle();
+
+            // Resetear la sesión para modo "agregar"
+            Session["opcion"] = 0;
+            Session["index"] = -1;
+
+            // El modal se abre desde JavaScript (OnClientClick del LinkButton)
+            // Este método solo prepara los campos
+            //popUpDetalle.Show();
         }
 
-        protected void btnAceptarAuditoria_Click(object sender, EventArgs e)
-        {
-            Entities.OrdenPedido oOrden = (Entities.OrdenPedido)Session["ordenPedido"];
-            oOrden.nroOrden = int.Parse(Request.QueryString["op"]);
-            if (txtObservAuditoria.Text.Trim() != string.Empty)
-            {
-                oOrden.obsAuditoria = txtObservAuditoria.Text.Trim().ToUpper();
 
-                List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas = leerGrillaFacturas();
-                if (lstFacturas.Count == 0)
-                {
-                    divConsultaError.Visible = true;
-                    HtmlGenericControl li = new HtmlGenericControl();
-                    li.InnerText = "Debe agregar al menos una Factura a la orden";
-                    ulErrores.Controls.Add(li);
-                    UPanelDatos.Update();
-                    return;
-                }
-                List<Entities.DetalleOrden> lstDetalle;
-                lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
-                //COMPROBAR MONTOS
-                if (lstDetalle.Sum(det => det.importe) != lstFacturas.Sum(fact => fact.IMPORTE))
-                {
-                    divConsultaError.Visible = true;
-                    HtmlGenericControl li = new HtmlGenericControl();
-                    li.InnerText = "El importe total de facturas no coinside con el importe total cargado en el detalle";
-                    ulErrores.Controls.Add(li);
-                    UPanelDatos.Update();
-                    return;
-                }
 
-                oOrden.web = 1;
-                BLL.OrdenPedidoBLL.Update(oOrden, lstFacturas);
-                popUpAuditoria.Hide();
-                Session["ordenPedido"] = oOrden;
-            }
-        }
 
-        protected void btnCancelarAuditoria_Click(object sender, EventArgs e)
-        {
-            popUpAuditoria.Hide();
-            btnPrint.Visible = false;
-            btnAddOrden.Visible = false;
-            btnSave.Visible = true;
-        }
 
         protected void btnConsulta_Click(object sender, EventArgs e)
         {
@@ -774,10 +1012,10 @@ namespace Web.Secure
                     lst.Add(objFact);
                     if (txtNroFactura.Value == string.Empty)
                         txtNroFactura.Value = string.Format("{0}-{1}", resultado.CmpResp.PtoVta.ToString().PadLeft(4, Convert.ToChar("0")),
-    resultado.CmpResp.CbteNro.ToString().PadLeft(8, Convert.ToChar("0")));
+                            resultado.CmpResp.CbteNro.ToString().PadLeft(8, Convert.ToChar("0")));
                     else
                         txtNroFactura.Value += string.Format(" / {0}-{1}", resultado.CmpResp.PtoVta.ToString().PadLeft(4, Convert.ToChar("0")),
-    resultado.CmpResp.CbteNro.ToString().PadLeft(8, Convert.ToChar("0")));
+                            resultado.CmpResp.CbteNro.ToString().PadLeft(8, Convert.ToChar("0")));
 
                     fillFacturas(lst);
 
@@ -864,7 +1102,335 @@ namespace Web.Secure
             }
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////
+        protected void lbtnAddExcel_Click(object sender, EventArgs e)
+        {
+            // Este método ahora abre el modal desde JavaScript
+            // La lógica se maneja en btnProcesarExcel_Click
+        }
 
+        protected void btnProcesarExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (fuExcel.HasFile)
+                {
+                    // Validar extensión del archivo
+                    string extension = System.IO.Path.GetExtension(fuExcel.FileName).ToLower();
+                    if (extension != ".xlsx" && extension != ".xls")
+                    {
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                            "alert('Por favor seleccione un archivo Excel válido (.xlsx o .xls)');", true);
+                        return;
+                    }
+
+                    // Validar tamaño del archivo (máximo 5MB)
+                    if (fuExcel.PostedFile.ContentLength > 5 * 1024 * 1024)
+                    {
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                            "alert('El archivo no puede ser mayor a 5MB');", true);
+                        return;
+                    }
+
+                    // Guardar archivo temporalmente
+                    string fileName = Guid.NewGuid().ToString() + extension;
+                    string tempPath = Server.MapPath("~/App_Data/Temp/");
+
+                    // Crear directorio si no existe
+                    if (!System.IO.Directory.Exists(tempPath))
+                    {
+                        System.IO.Directory.CreateDirectory(tempPath);
+                    }
+
+                    string filePath = tempPath + fileName;
+                    fuExcel.SaveAs(filePath);
+
+                    // Procesar el archivo Excel
+                    var itemsExcel = ProcesarArchivoExcel(filePath);
+
+                    if (itemsExcel.Count > 0)
+                    {
+                        // Agregar items al detalle existente
+                        AgregarItemsDesdeExcel(itemsExcel);
+
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "success",
+                            $"alert('Se agregaron {itemsExcel.Count} items desde el Excel');", true);
+                    }
+                    else
+                    {
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                            "alert('No se encontraron datos válidos en el archivo Excel');", true);
+                    }
+
+                    // Eliminar archivo temporal
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+
+                    // Cerrar modal
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "closeModal",
+                        "$('#modalSubirExcel').modal('hide');", true);
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                        "alert('Por favor seleccione un archivo');", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    $"alert('Error al procesar archivo: {ex.Message}');", true);
+            }
+        }
+
+        private List<Entities.DetalleOrden> ProcesarArchivoExcel(string filePath)
+        {
+            var items = new List<Entities.DetalleOrden>();
+
+            try
+            {
+                // Elegir el método según la librería instalada:
+
+                // Opción 1: EPPlus (recomendado)
+                // items = LeerExcelConEPPlus(filePath);
+
+                // Opción 2: ClosedXML (solo .xlsx)
+                items = LeerExcelConClosedXML(filePath);
+
+                // Opción 3: ExcelDataReader
+                // items = LeerExcelConDataReader(filePath);
+
+                // Opción 4: OleDb (método actual)
+                // items = LeerExcelConOleDb(filePath);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al leer el archivo Excel: {ex.Message}");
+            }
+
+            return items;
+        }
+
+        private List<Entities.DetalleOrden> LeerExcelConClosedXML(string filePath)
+        {
+            var items = new List<Entities.DetalleOrden>();
+
+            using (var workbook = new XLWorkbook(filePath))
+            {
+                var worksheet = workbook.Worksheet(1); // Primera hoja
+
+                // Empezar desde la fila 2
+                for (int row = 2; row <= worksheet.LastRowUsed().RowNumber(); row++)
+                {
+                    try
+                    {
+                        string descripcion = worksheet.Cell(row, 1).Value.ToString()?.Trim();
+                        string cantidadStr = worksheet.Cell(row, 2).Value.ToString()?.Trim();
+                        string precioStr = worksheet.Cell(row, 3).Value.ToString()?.Trim();
+
+                        if (string.IsNullOrEmpty(descripcion) ||
+                            string.IsNullOrEmpty(cantidadStr) ||
+                            string.IsNullOrEmpty(precioStr))
+                            continue;
+
+                        if (decimal.TryParse(cantidadStr, out decimal cantidad) &&
+                            decimal.TryParse(precioStr, out decimal precio))
+                        {
+                            var detalle = new Entities.DetalleOrden
+                            {
+                                descItems = descripcion,
+                                cant = cantidad,
+                                precio = precio,
+                                importe = decimal.Round(cantidad * precio, 2)
+                            };
+
+                            items.Add(detalle);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            return items;
+        }
+
+        private void AgregarItemsDesdeExcel(List<Entities.DetalleOrden> itemsExcel)
+        {
+            // Obtener el detalle actual de la sesión
+            var lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"] ?? new List<Entities.DetalleOrden>();
+
+            // Agregar los nuevos items
+            lstDetalle.AddRange(itemsExcel);
+
+            // Calcular el nuevo total
+            decimal total = lstDetalle.Sum(det => det.importe);
+
+            // Actualizar sesión
+            Session["Detalle"] = lstDetalle;
+            Session["Total"] = total;
+
+            // Actualizar la grilla y el total en pantalla
+            fillDetalle(lstDetalle);
+            lblTotal.InnerText = "TOTAL: $" + total.ToString();
+        }
+
+        protected void lnkAceptarAuditoria_Click(object sender, EventArgs e)
+        {
+            Entities.OrdenPedido oOrden = (Entities.OrdenPedido)Session["ordenPedido"];
+            oOrden.nroOrden = int.Parse(Request.QueryString["op"]);
+
+
+            if (txtObservAuditoria.Text.Trim() != string.Empty)
+            {
+                oOrden.obsAuditoria = txtObservAuditoria.Text.Trim().ToUpper();
+
+                List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas = leerGrillaFacturas();
+                if (lstFacturas.Count == 0)
+                {
+                    divConsultaError.Visible = true;
+                    HtmlGenericControl li = new HtmlGenericControl();
+                    li.InnerText = "Debe agregar al menos una Factura a la orden";
+                    ulErrores.Controls.Add(li);
+                    UPanelDatos.Update();
+                    return;
+                }
+                List<Entities.DetalleOrden> lstDetalle;
+                lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
+                //COMPROBAR MONTOS
+                if (lstDetalle.Sum(det => det.importe) != lstFacturas.Sum(fact => fact.IMPORTE))
+                {
+                    divConsultaError.Visible = true;
+                    HtmlGenericControl li = new HtmlGenericControl();
+                    li.InnerText = "El importe total de facturas no coinside con el importe total cargado en el detalle";
+                    ulErrores.Controls.Add(li);
+                    UPanelDatos.Update();
+                    return;
+                }
+
+                //oOrden.web = 1;
+                //BLL.OrdenPedidoBLL.Update(oOrden, lstFacturas);
+                //popUpAuditoria.Hide();
+                //Session["ordenPedido"] = oOrden;
+
+
+                oOrden.web = 1;
+                BLL.OrdenPedidoBLL.Update(oOrden, lstFacturas);
+
+                // Cambiar popUpAuditoria.Hide() por:
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "hideAuditModal",
+                    "$('#modalAuditoria').modal('hide');", true);
+
+                Session["ordenPedido"] = oOrden;
+            }
+            else
+            {
+                // Agregar validación para campo obligatorio
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+                    "alert('Debe ingresar el motivo de la modificación');", true);
+                txtObservAuditoria.Focus();
+            }
+        }
+
+
+        protected void lnkCancelarAuditoria_Click(object sender, EventArgs e)
+        {
+            // Cambiar popUpAuditoria.Hide() por:
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "hideAuditModal",
+                "$('#modalAuditoria').modal('hide');", true);
+            btnPrint.Visible = false;
+            btnAddOrden.Visible = false;
+            btnSave.Visible = true;
+        }
+
+        protected void LinkButton1_Click(object sender, EventArgs e)
+        {
+            CleanCamposDetalle();
+        }
     }
 }
+
+
+
+
+
+//protected void btnAceptarAuditoria_Click(object sender, EventArgs e)
+//{
+//    Entities.OrdenPedido oOrden = (Entities.OrdenPedido)Session["ordenPedido"];
+//    oOrden.nroOrden = int.Parse(Request.QueryString["op"]);
+//    if (txtObservAuditoria.Text.Trim() != string.Empty)
+//    {
+//        oOrden.obsAuditoria = txtObservAuditoria.Text.Trim().ToUpper();
+
+//        List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas = leerGrillaFacturas();
+//        if (lstFacturas.Count == 0)
+//        {
+//            divConsultaError.Visible = true;
+//            HtmlGenericControl li = new HtmlGenericControl();
+//            li.InnerText = "Debe agregar al menos una Factura a la orden";
+//            ulErrores.Controls.Add(li);
+//            UPanelDatos.Update();
+//            return;
+//        }
+//        List<Entities.DetalleOrden> lstDetalle;
+//        lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
+//        //COMPROBAR MONTOS
+//        if (lstDetalle.Sum(det => det.importe) != lstFacturas.Sum(fact => fact.IMPORTE))
+//        {
+//            divConsultaError.Visible = true;
+//            HtmlGenericControl li = new HtmlGenericControl();
+//            li.InnerText = "El importe total de facturas no coinside con el importe total cargado en el detalle";
+//            ulErrores.Controls.Add(li);
+//            UPanelDatos.Update();
+//            return;
+//        }
+
+//        //oOrden.web = 1;
+//        //BLL.OrdenPedidoBLL.Update(oOrden, lstFacturas);
+//        //popUpAuditoria.Hide();
+//        //Session["ordenPedido"] = oOrden;
+//        oOrden.web = 1;
+//        BLL.OrdenPedidoBLL.Update(oOrden, lstFacturas);
+
+//        // Cambiar popUpAuditoria.Hide() por:
+//        ScriptManager.RegisterStartupScript(this, this.GetType(), "hideAuditModal",
+//            "$('#modalAuditoria').modal('hide');", true);
+
+//        Session["ordenPedido"] = oOrden;
+//    }
+//    else
+//    {
+//        // Agregar validación para campo obligatorio
+//        ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
+//            "alert('Debe ingresar el motivo de la modificación');", true);
+//        txtObservAuditoria.Focus();
+//    }
+//}
+
+//protected void btnCancelarAuditoria_Click(object sender, EventArgs e)
+//{
+//    //popUpAuditoria.Hide();
+//    //btnPrint.Visible = false;
+//    //btnAddOrden.Visible = false;
+//    //btnSave.Visible = true;
+
+
+//    // Cambiar popUpAuditoria.Hide() por:
+//    ScriptManager.RegisterStartupScript(this, this.GetType(), "hideAuditModal",
+//        "$('#modalAuditoria').modal('hide');", true);
+//    btnPrint.Visible = false;
+//    btnAddOrden.Visible = false;
+//    btnSave.Visible = true;
+//}
+
+
+
+
+
+
+
+
+

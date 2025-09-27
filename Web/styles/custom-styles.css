@@ -1,0 +1,71 @@
+﻿/* Estilos personalizados para newOpBootstrap.aspx */
+
+.border-success {
+    border: 2px solid #28a745 !important;
+    transition: border 0.3s ease;
+}
+
+/* Estilos para el modal de reporte */
+#modalReporteOP .modal-dialog {
+    margin: 30px auto;
+}
+
+#modalReporteOP .modal-body iframe {
+    border: none;
+    border-radius: 4px;
+}
+
+#modalReporteOP .modal-header {
+    border-radius: 6px 6px 0 0;
+}
+
+/* Responsive para el modal de reporte */
+@media (max-width: 768px) {
+    #modalReporteOP .modal-dialog {
+        width: 95%;
+        margin: 10px auto;
+    }
+
+    #modalReporteOP .modal-body {
+        height: 50vh;
+    }
+}
+
+/* Estilos adicionales para modales */
+.modal-fade {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Estilos para formulario */
+.form-highlight {
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+/* Estilos para botones mejorados */
+.btn-custom {
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn-custom:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+/* Estilos para el modal de auditoría */
+#modalAuditoria .modal-header {
+    border-radius: 6px 6px 0 0;
+}
+
+#modalAuditoria .form-control {
+    resize: vertical;
+}
+
+/* Efecto de fade mejorado */
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.fade.in .modal-dialog {
+    transform: translateY(0);
+}

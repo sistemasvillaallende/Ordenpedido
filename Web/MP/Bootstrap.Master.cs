@@ -7,12 +7,20 @@ using System.Web.UI.WebControls;
 
 namespace Web.MP
 {
-    public partial class Boottrap : System.Web.UI.MasterPage
+    public partial class Bootstrap : System.Web.UI.MasterPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            lblUsuario.InnerHtml = Request.Cookies["UserOP"]["usuario"].ToString();
-            lblUsuario2.InnerHtml = Request.Cookies["UserOP"]["usuario"].ToString();
+            if (!IsPostBack)
+            {
+                HttpCookie userCookie = Request.Cookies["UserOP"];
+                string usuario = (userCookie != null && userCookie["usuario"] != null)
+                                 ? userCookie["usuario"]
+                                 : "Invitado";
+
+                lblUsuario.Text = usuario;
+                lblUsuario2.Text = usuario;
+            }
         }
     }
 }

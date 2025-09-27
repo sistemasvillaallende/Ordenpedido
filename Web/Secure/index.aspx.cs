@@ -63,6 +63,19 @@ namespace Web.Secure
                     Response.Redirect("NewOpCC.aspx?op=" + cod);
 
             }
+            //if (e.CommandName == "ver")
+            //{
+            //    int index = Convert.ToInt32(e.CommandArgument);
+            //    string cod = Convert.ToString(gvOrden.DataKeys[index].Values["nroOrden"]);
+            //    var estados = BLL.OrdenPedidoBLL.GetEstadoOP(int.Parse(cod)); // List<DAL.ConsultaEstadoOP>
+
+            //    gvEstados.DataSource = estados;
+            //    gvEstados.DataBind();
+
+            //    string script = "$('#modalVerOP').modal('show');";
+            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "verOPModal", script, true);
+            //}
+
         }
 
         protected void gvOrden_RowDataBound(object sender, GridViewRowEventArgs e)

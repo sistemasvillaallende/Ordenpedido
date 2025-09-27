@@ -7,11 +7,13 @@
 // </generado automáticamente>
 //------------------------------------------------------------------------------
 
-namespace Web.MP {
-    
-    
-    public partial class Boottrap {
-        
+namespace Web.MP
+{
+
+
+    public partial class Bootstrap
+    {
+
         /// <summary>
         /// Control head.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Web.MP {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ContentPlaceHolder head;
-        
+
         /// <summary>
         /// Control form1.
         /// </summary>
@@ -29,7 +31,7 @@ namespace Web.MP {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
-        
+
         /// <summary>
         /// Control lblUsuario.
         /// </summary>
@@ -37,8 +39,8 @@ namespace Web.MP {
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblUsuario;
-        
+        protected global::System.Web.UI.WebControls.Label lblUsuario;
+
         /// <summary>
         /// Control lblUsuario2.
         /// </summary>
@@ -46,8 +48,8 @@ namespace Web.MP {
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblUsuario2;
-        
+        protected global::System.Web.UI.WebControls.Label lblUsuario2;
+
         /// <summary>
         /// Control ContentPlaceHolder1.
         /// </summary>
@@ -56,5 +58,14 @@ namespace Web.MP {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ContentPlaceHolder ContentPlaceHolder1;
+
+        /// <summary>
+        /// Control ScriptsContent.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder ScriptsContent;
     }
 }

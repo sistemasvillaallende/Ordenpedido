@@ -42,20 +42,23 @@
             </div>
             <div class="box-body">
                 <div class="form-group">
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
                         <label for="nroOrden">Nro. Orden de Pedido</label>
                         <p class="form-control-static" id="txtOP" runat="server">0000</p>
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
                         <label for="fecha">Fecha</label>
                         <p class="form-control-static" id="txtFechaOp" runat="server"></p>
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-sm-3">
+                        <label for="estado">Estado OP</label>
+                        <p class="form-control-static" id="txtEstado_op" runat="server"></p>
+                    </div>
+                    <div class="col-sm-3">
                         <label for="fecha">Origen</label>
                         <p class="form-control-static" id="P1" runat="server"></p>
                     </div>
                 </div>
-
             </div>
         </div>
         <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
@@ -145,6 +148,29 @@
                 <!-- ////////////////////////////// AUTORIZA - SOLICITA/////////////////////////////////// -->
                 <asp:UpdatePanel ID="UPanelDatos" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label for="ejemplo_email_1">SecretariaAutoriza</label>
+                                    <asp:DropDownList ID="ddlSecretariaAutoriza" runat="server" CssClass="form-control"
+                                        AutoPostBack="True" OnSelectedIndexChanged="ddlSecretariaAutoriza_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                    <asp:RequiredFieldValidator ID="rfvSecretariaAutoriza" runat="server"
+                                        ErrorMessage="Debe seleccionar Secretaría" ControlToValidate="ddlSecretariaAutoriza"
+                                        ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                    &nbsp;
+                                </div>
+                                <div class="col-xs-6">
+                                    <label for="ejemplo_email_1">Direccion Solicitante</label>
+                                    <asp:DropDownList ID="ddlDireccionSolicitante" runat="server" CssClass="form-control"
+                                        AutoPostBack="True" OnSelectedIndexChanged="ddlDireccionSolicitante_SelectedIndexChanged">
+                                    </asp:DropDownList>
+                                    <asp:RequiredFieldValidator ID="rfvDireccionSolicitante" runat="server"
+                                        ErrorMessage="Debe seleccionar Dirección" ControlToValidate="ddlDireccionSolicitante"
+                                        ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-6">
@@ -272,7 +298,7 @@
             </div>
         </div>
         <!-- ////////////////////////////////// BOTONES ////////////////////////////////////////////// -->
-        <div class="form-group" style="text-align:right;">
+        <div class="form-group" style="text-align: right;">
             <asp:UpdatePanel ID="UpdatePanel6" runat="server">
                 <ContentTemplate>
                     <div class="btn-group">

@@ -11,16 +11,10 @@ namespace BLL
 {
     public class OrdenPedidoBLL
     {
-
-
         public static string FechaServer()
         {
-
             return DAL.OrdenPedidoDAL.FechaServer();
-
         }
-
-
         public static Int64 Insert(OrdenPedido op, List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas)
         {
             Int64 nroOrden = 0;
@@ -81,38 +75,45 @@ namespace BLL
         //    }
         //}
 
+
         public static void Update(OrdenPedido op, List<DAL.FACTURA_X_ORDEN_PEDIDO> lstFacturas)
         {
-            SqlConnection cn = DAL.DALBase.GetConnection();
-            SqlTransaction trx = null;
-            try
+            using (SqlConnection cn = DAL.DALBase.GetConnection())
             {
                 cn.Open();
-                trx = cn.BeginTransaction();
-                OrdenPedidoDAL.updateOP(op, cn, trx);
-                OrdenPedidoDAL.updateDetalle(op, cn, trx);
-                int i = 1;
-                foreach (var itemDet in op.detalle)
+                using (SqlTransaction trx = cn.BeginTransaction())
                 {
-                    itemDet.nroItems = i;
-                    itemDet.nroOrden = op.nroOrden;
-                    OrdenPedidoDAL.insertDetalle(itemDet, cn, trx);
-                    i++;
+                    try
+                    {
+                        OrdenPedidoDAL.updateOP(op, cn, trx);
+                        OrdenPedidoDAL.updateDetalle(op, cn, trx);
+
+                        int i = 1;
+                        foreach (var itemDet in op.detalle)
+                        {
+                            itemDet.nroItems = i;
+                            itemDet.nroOrden = op.nroOrden;
+                            OrdenPedidoDAL.insertDetalle(itemDet, cn, trx);
+                            i++;
+                        }
+
+                        OrdenPedidoDAL.insertAuditoria(op, 1, cn, trx);
+                        DAL.FACTURA_X_ORDEN_PEDIDO.delete(op.nroOrden, cn, trx);
+
+                        foreach (var item in lstFacturas)
+                        {
+                            item.NRO_ORDEN_PEDIDO = op.nroOrden;
+                            FACTURA_X_ORDEN_PEDIDO.insert(item, cn, trx);
+                        }
+
+                        trx.Commit();
+                    }
+                    catch
+                    {
+                        trx.Rollback();
+                        throw;
+                    }
                 }
-                OrdenPedidoDAL.insertAuditoria(op, 1, cn, trx);
-                DAL.FACTURA_X_ORDEN_PEDIDO.delete(op.nroOrden, cn, trx);
-                foreach (var item in lstFacturas)
-                {
-                    item.NRO_ORDEN_PEDIDO = op.nroOrden;
-                    FACTURA_X_ORDEN_PEDIDO.insert(item, cn, trx);
-                }
-                trx.Commit();
-            }
-            catch (Exception ex)
-                {
-                trx.Rollback();
-                cn.Close();
-                throw ex;
             }
         }
 
@@ -164,6 +165,16 @@ namespace BLL
                 strSQL.AppendLine(" AND OP.Usuario = '" + nombreUsuario + "'");
 
             return DAL.OrdenPedidoDAL.getsOP(strSQL.ToString());
+        }
+
+        public static List<FACTURA_X_ORDEN_PEDIDO> readFactu_x_OP(int nroOp)
+        {
+            return DAL.FACTURA_X_ORDEN_PEDIDO.read(nroOp);
+        }
+
+        public static List<ConsultaEstadoOP> GetEstadoOP(int nroNotaPedido)
+        {
+            return DAL.ConsultaEstadoOP.GetByOP(nroNotaPedido);
         }
     }
 }

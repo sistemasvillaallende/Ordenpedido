@@ -45,7 +45,15 @@ namespace Entities
         public string formatFec { get; set; }
         //public string observacion { get; set; }
         public string CUIT { get; set; }
-    
+        //nvos campos
+      
+
+        public int? cod_secretaria_autoriza { get; set; }
+        public int? cod_direccion_solicita { get; set; }
+        public string secretaria_autoriza { get; set; }
+        public string direccion_solicita { get; set; }
+        public string estado_op { get; set; } = string.Empty;
+
 
 
         public OrdenPedido()
@@ -53,6 +61,10 @@ namespace Entities
             detalle = new List<DetalleOrden>();
             fechaOrdenCompra = null;
             obsAuditoria = string.Empty;
+            cod_secretaria_autoriza = null;
+            cod_direccion_solicita = null;
+            secretaria_autoriza = string.Empty; 
+            direccion_solicita = string.Empty;
         }
 
     }

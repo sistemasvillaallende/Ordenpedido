@@ -8,7 +8,7 @@ namespace Web.Reportes
 {
     public class OrdenPedidoPDF
     {
-        public byte[] GenerarPDF(Entities.OrdenPedido oOrden, string logoPath = null, string usuario_imprime = null)
+        public byte[] GenerarPDF(Entities.OrdenPedido oOrden, bool constatada, string logoPath = null, string usuario_imprime = null)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace Web.Reportes
                     CrearEncabezadoConLinea(document);
 
                     // NOTA FINAL y FIRMA
-                    CrearNotaYFirmas(document, fontPequeno, fontNormal);
+                    CrearNotaYFirmas(document, constatada, fontPequeno, fontNormal);
 
                     document.Close();
                     return output.ToArray();
@@ -143,88 +143,88 @@ namespace Web.Reportes
             document.Add(new Paragraph("\n"));
         }
 
-        private void CrearRegionProveedorySolicitud(Document document, Entities.OrdenPedido oOrden, Font fontSubtitulo, Font fontNormal)
-        {
-            #region TABLA de Proveedor y Solicitud
+        //private void CrearRegionProveedorySolicitud(Document document, Entities.OrdenPedido oOrden, Font fontSubtitulo, Font fontNormal)
+        //{
+        //    #region TABLA de Proveedor y Solicitud
 
-            Paragraph salto = new Paragraph();
-            salto.SpacingAfter = 1;
-            PdfPTable tblTablaProveedorySolicitud = new PdfPTable(2)
-            {
-                WidthPercentage = 100,
-                //Border = Rectangle.NO_BORDER,
-                //Padding = 10,
-            };
-            PdfPCell clTablaProveedor = new PdfPCell()
-            {
-                BorderWidth = 0,
-                BorderWidthTop = 1f,
-                BorderWidthBottom = 1f,
-                BorderWidthLeft = 1f,
-                BorderWidthRight = 1f,
-                Padding = 10
-            };
-
-
-            PdfPCell clDatosProveedor = new PdfPCell()
-            {
-                BorderWidth = 0,
-                BorderWidthTop = 1f,
-                BorderWidthBottom = 1f,
-                BorderWidthRight = 1f,
-                BorderWidthLeft = 1f,
-                Padding = 10
-            };
-            clDatosProveedor.AddElement(new Phrase("PROVEEDOR ", fontSubtitulo));
-            clDatosProveedor.AddElement(salto);
-            clDatosProveedor.AddElement(new Phrase(string.Format("Razon Social : {0}", oOrden.proveedor, fontNormal)));
-            clDatosProveedor.AddElement(salto);
-            clDatosProveedor.AddElement(new Phrase(string.Format("Nº Factura   : {0}", oOrden.nroFacturas, fontNormal)));
-            clDatosProveedor.AddElement(salto);
-            clDatosProveedor.AddElement(new Phrase(string.Format("Nº Presupuesto : {0}", oOrden.nroPresupuesto, fontNormal)));
-            clDatosProveedor.AddElement(salto);
-            clDatosProveedor.AddElement(new Phrase(string.Format("Forma Pago : {0}", oOrden.formaPago, fontNormal)));
-
-            PdfPCell clDatosSolicitud = new PdfPCell()
-            {
-                BorderWidth = 0,
-                BorderWidthTop = 1f,
-                BorderWidthBottom = 1f,
-                BorderWidthRight = 1f,
-                Padding = 10,
-                HorizontalAlignment = 1
-            };
-
-            Entities.Oficinas origen = BLL.OficinasBLL.getOficinaByPk(oOrden.codOficinaOrigen);
-            clDatosSolicitud.AddElement(new Phrase("SOLICITUD ", fontSubtitulo));
-            clDatosSolicitud.AddElement(salto);
-            clDatosSolicitud.AddElement(new Phrase(string.Format("Destino  : {0}", oOrden.destino, fontNormal)));
-            clDatosSolicitud.AddElement(salto);
-            clDatosSolicitud.AddElement(new Phrase(string.Format("Origen   : {0}", origen.nombre, fontNormal)));
-            clDatosSolicitud.AddElement(salto);
-            clDatosSolicitud.AddElement(new Phrase(string.Format("Solicito : {0}", oOrden.solicitante, fontNormal)));
-            clDatosSolicitud.AddElement(salto);
-            clDatosSolicitud.AddElement(new Phrase(string.Format("Aprobo   : {0}", oOrden.aprobado, fontNormal)));
+        //    Paragraph salto = new Paragraph();
+        //    salto.SpacingAfter = 1;
+        //    PdfPTable tblTablaProveedorySolicitud = new PdfPTable(2)
+        //    {
+        //        WidthPercentage = 100,
+        //        //Border = Rectangle.NO_BORDER,
+        //        //Padding = 10,
+        //    };
+        //    PdfPCell clTablaProveedor = new PdfPCell()
+        //    {
+        //        BorderWidth = 0,
+        //        BorderWidthTop = 1f,
+        //        BorderWidthBottom = 1f,
+        //        BorderWidthLeft = 1f,
+        //        BorderWidthRight = 1f,
+        //        Padding = 10
+        //    };
 
 
-            tblTablaProveedorySolicitud.AddCell(clDatosProveedor);
-            tblTablaProveedorySolicitud.AddCell(clDatosSolicitud);
+        //    PdfPCell clDatosProveedor = new PdfPCell()
+        //    {
+        //        BorderWidth = 0,
+        //        BorderWidthTop = 1f,
+        //        BorderWidthBottom = 1f,
+        //        BorderWidthRight = 1f,
+        //        BorderWidthLeft = 1f,
+        //        Padding = 10
+        //    };
+        //    clDatosProveedor.AddElement(new Phrase("PROVEEDOR ", fontSubtitulo));
+        //    clDatosProveedor.AddElement(salto);
+        //    clDatosProveedor.AddElement(new Phrase(string.Format("Razon Social : {0}", oOrden.proveedor, fontNormal)));
+        //    clDatosProveedor.AddElement(salto);
+        //    clDatosProveedor.AddElement(new Phrase(string.Format("Nº Factura   : {0}", oOrden.nroFacturas, fontNormal)));
+        //    clDatosProveedor.AddElement(salto);
+        //    clDatosProveedor.AddElement(new Phrase(string.Format("Nº Presupuesto : {0}", oOrden.nroPresupuesto, fontNormal)));
+        //    clDatosProveedor.AddElement(salto);
+        //    clDatosProveedor.AddElement(new Phrase(string.Format("Forma Pago : {0}", oOrden.formaPago, fontNormal)));
 
-            //clTablaVisado.AddElement(tblPases);
-            //tblTablaVisado.AddCell(clTablaVisado);
-            document.Add(tblTablaProveedorySolicitud);
+        //    PdfPCell clDatosSolicitud = new PdfPCell()
+        //    {
+        //        BorderWidth = 0,
+        //        BorderWidthTop = 1f,
+        //        BorderWidthBottom = 1f,
+        //        BorderWidthRight = 1f,
+        //        Padding = 10,
+        //        HorizontalAlignment = 1
+        //    };
 
-            #endregion
-        }
+        //    Entities.Oficinas origen = BLL.OficinasBLL.getOficinaByPk(oOrden.codOficinaOrigen);
+        //    clDatosSolicitud.AddElement(new Phrase("SOLICITUD ", fontSubtitulo));
+        //    clDatosSolicitud.AddElement(salto);
+        //    clDatosSolicitud.AddElement(new Phrase(string.Format("Destino  : {0}", oOrden.destino, fontNormal)));
+        //    clDatosSolicitud.AddElement(salto);
+        //    clDatosSolicitud.AddElement(new Phrase(string.Format("Origen   : {0}", origen.nombre, fontNormal)));
+        //    clDatosSolicitud.AddElement(salto);
+        //    clDatosSolicitud.AddElement(new Phrase(string.Format("Solicito : {0}", oOrden.solicitante, fontNormal)));
+        //    clDatosSolicitud.AddElement(salto);
+        //    clDatosSolicitud.AddElement(new Phrase(string.Format("Aprobo   : {0}", oOrden.aprobado, fontNormal)));
 
-        private PdfPCell CrearCeldaInfo(string titulo, string valor, Font fontSubtitulo, Font fontNormal)
-        {
-            PdfPCell cell = new PdfPCell();
-            cell.Border = Rectangle.NO_BORDER;
-            cell.AddElement(new Paragraph(titulo, fontSubtitulo));
-            cell.AddElement(new Paragraph(valor, fontNormal));
-            return cell;
-        }
+
+        //    tblTablaProveedorySolicitud.AddCell(clDatosProveedor);
+        //    tblTablaProveedorySolicitud.AddCell(clDatosSolicitud);
+
+        //    //clTablaVisado.AddElement(tblPases);
+        //    //tblTablaVisado.AddCell(clTablaVisado);
+        //    document.Add(tblTablaProveedorySolicitud);
+
+        //    #endregion
+        //}
+
+        //private PdfPCell CrearCeldaInfo(string titulo, string valor, Font fontSubtitulo, Font fontNormal)
+        //{
+        //    PdfPCell cell = new PdfPCell();
+        //    cell.Border = Rectangle.NO_BORDER;
+        //    cell.AddElement(new Paragraph(titulo, fontSubtitulo));
+        //    cell.AddElement(new Paragraph(valor, fontNormal));
+        //    return cell;
+        //}
 
         //private void CrearInfoProveedorYSolicitudV2(Document document, Entities.OrdenPedido oOrden, Font fontSubtitulo, Font fontNormal)
         //{
@@ -684,7 +684,7 @@ namespace Web.Reportes
         }
 
         //
-        private void CrearNotaYFirmas(Document document, Font fontPequeno, Font fontNormal)
+        private void CrearNotaYFirmas(Document document, bool constatada, Font fontPequeno, Font fontNormal)
         {
             // Crear tabla con dos columnas
             PdfPTable tabla = new PdfPTable(2);
@@ -692,8 +692,17 @@ namespace Web.Reportes
             tabla.SetWidths(new float[] { 3f, 1f }); // Más espacio para la nota
 
             // Celda de la nota
-            string textoNota = "Factura/s NO constatadas por ser orden con contrato, presupuesto u\n" +
-                               "otro documento válido – se deberá cargar la Factura en la Orden de";
+            string textoNota = string.Empty;
+            if (constatada)
+            {
+                textoNota = "Factura/s constatada/s OK ante ARCA de manera automática.!";
+            }
+            else
+            {
+                textoNota = "Factura/s NO constatadas por ser orden con contrato, presupuesto u\n" +
+                               "otro documento válido – se deberá cargar la Factura en la Orden de Pedido.!";
+            }
+
             PdfPCell celdaNota = new PdfPCell(new Phrase(textoNota, fontPequeno));
             celdaNota.Border = Rectangle.NO_BORDER;
             celdaNota.HorizontalAlignment = Element.ALIGN_LEFT;

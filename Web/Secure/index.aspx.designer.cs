@@ -7,11 +7,13 @@
 // </generado automáticamente>
 //------------------------------------------------------------------------------
 
-namespace Web.Secure {
-    
-    
-    public partial class findOpBootstrap {
-        
+namespace Web.Secure
+{
+
+
+    public partial class findOpBootstrap
+    {
+
         /// <summary>
         /// Control lblOffice.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Web.Secure {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblOffice;
-        
+
         /// <summary>
         /// Control lblUsuario.
         /// </summary>
@@ -29,7 +31,7 @@ namespace Web.Secure {
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl lblUsuario;
-        
+
         /// <summary>
         /// Control gvOrden.
         /// </summary>

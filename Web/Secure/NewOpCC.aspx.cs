@@ -17,14 +17,14 @@ namespace Web.Secure
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            Entities.OrdenPedido ordenPedido = null;
             if (!IsPostBack)
             {
 
                 fillDetalle(new List<DetalleOrden>());
                 btnPrint.Visible = false;
                 btnAddOrden.Visible = false;
-                //txtFechaOp.InnerText = DateTime.Now.ToShortDateString();
-                txtFechaOp.InnerHtml = BLL.OrdenPedidoBLL.FechaServer();//DateTime.Now.ToString();
+                txtFechaOp.InnerHtml = BLL.OrdenPedidoBLL.FechaServer();
                 if (Request.Cookies["UserOP"]["id_oficina_usuario"].ToString() != null)
                 {
                     P1.InnerText = Request.Cookies["UserOP"]["id_oficina_usuario"].ToString().ToString() + " - " +
@@ -37,11 +37,15 @@ namespace Web.Secure
                 Session.Add("index", 0);
                 Session.Add("ordenPedido", null);
                 Session.Add("nroOrden", 0);
+                CargarDesplegables();
                 if (Request.QueryString["op"] != null)
                 {
                     int op = int.Parse(Request.QueryString["op"]);
                     if (op != 0)
-                        fillDatos(BLL.OrdenPedidoBLL.getOrdenesByPk(op));
+                    {
+                        ordenPedido = BLL.OrdenPedidoBLL.getOrdenesByPk(op);
+                        fillDatos(ordenPedido);
+                    }
                 }
 
                 if (Request.QueryString["opcion"] != null)
@@ -59,9 +63,63 @@ namespace Web.Secure
                         lnkFindProv.Enabled = true;
                     }
                 }
+
+                txtEstado_op.InnerHtml = ordenPedido != null
+                ? GetEstadoOPDescripcion(ordenPedido.codEstadoOP)
+                : "Sin estado";
             }
         }
 
+        private static string GetEstadoOPDescripcion(int codEstadoOp)
+        {
+            switch (codEstadoOp)
+            {
+                case 1:
+                    return "Recibida";
+                case 2:
+                    return "Devuelta";
+                default:
+                    return "Sin Estado";
+            }
+        }
+
+
+        private void CargarDesplegables()
+        {
+            ddlSecretariaAutoriza.DataTextField = "descripcion";
+            ddlSecretariaAutoriza.DataValueField = "id_secretaria";
+            ddlSecretariaAutoriza.DataSource = DAL.DesplegablesDAL.GetSecretarias(0);
+            ddlSecretariaAutoriza.DataBind();
+            ddlSecretariaAutoriza.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+
+            //ddlDireccionSolicitante.DataTextField = "descripcion";
+            //ddlDireccionSolicitante.DataValueField = "id_direccion";
+            //ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(0);
+            //ddlDireccionSolicitante.DataBind();
+            //ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+        }
+
+        protected void ddlSecretariaAutoriza_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int id = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
+            ddlDireccionSolicitante.DataTextField = "descripcion";
+            ddlDireccionSolicitante.DataValueField = "id_direccion";
+            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(id);
+            ddlDireccionSolicitante.DataBind();
+            ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
+
+            // Copiar el texto seleccionado en ddlSecretariaAutoriza al campo solicitante
+            txtAut.Value = ddlSecretariaAutoriza.SelectedItem.Text;
+            txtSolicitante.Value = string.Empty;
+            UPanelDatos.Update();
+        }
+
+        protected void ddlDireccionSolicitante_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Copiar el texto seleccionado en ddlDireccionSolicitante al campo aprobado
+            txtSolicitante.Value = ddlDireccionSolicitante.SelectedItem.Text;
+            UPanelDatos.Update();
+        }
 
         protected void fillDatos(Entities.OrdenPedido oOp)
         {
@@ -79,6 +137,8 @@ namespace Web.Secure
             txtFormaPago.Value = oOp.formaPago;
             txtNroPresup.Value = oOp.nroPresupuesto;
             txtNroFactura.Value = oOp.nroFacturas;
+            ddlSecretariaAutoriza.SelectedValue = (oOp.cod_secretaria_autoriza.HasValue) ? oOp.cod_secretaria_autoriza.Value.ToString() : "0";
+            ddlDireccionSolicitante.SelectedValue = (oOp.cod_direccion_solicita.HasValue) ? oOp.cod_direccion_solicita.Value.ToString() : "0";
             fillDetalle(oOp.detalle);
             decimal total = 0;
             for (int i = 0; i < oOp.detalle.Count; i++)
@@ -488,7 +548,10 @@ namespace Web.Secure
                 oOrden.obs = txtObs.Value.Trim().ToUpper();
             else
                 oOp.obs = string.Empty;
-
+            //
+            oOrden.cod_secretaria_autoriza = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
+            oOrden.cod_direccion_solicita = Convert.ToInt32(ddlDireccionSolicitante.SelectedValue);
+            //
             List<Entities.DetalleOrden> lstDetalle;
             lstDetalle = (List<Entities.DetalleOrden>)Session["Detalle"];
 
@@ -626,10 +689,13 @@ namespace Web.Secure
             //ScriptManager.RegisterStartupScript(this, typeof(Page), "popup", script, true);
 
             divReporte.InnerHtml = "<iframe src=\" " +
-             string.Format("../reportes/print.aspx?nroOrden_pedido={0}", cod) + "\"  width=\"100%\" height=\"600\"></iframe>";
+             string.Format("../Reportes/ReporteOrdenPedido.aspx?nroOrden_pedido={0}", cod) + "\"  width=\"100%\" height=\"600\"></iframe>";
 
             popUpListado.Show();
         }
+
+
+
 
 
 

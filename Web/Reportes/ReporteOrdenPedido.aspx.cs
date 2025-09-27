@@ -55,10 +55,16 @@ namespace Web.Reportes
             Response.Clear();
         }
 
-        private byte[] CreatePDF2(Entities.OrdenPedido oOrden, string logoPath = null, string usuario_imprime=null)
+        private byte[] CreatePDF2(Entities.OrdenPedido oOrden, string logoPath = null, string usuario_imprime = null)
         {
             OrdenPedidoPDF pdfGenerator = new OrdenPedidoPDF();
-            return pdfGenerator.GenerarPDF(oOrden, logoPath, usuario_imprime);//, Response);
+            var existe = BLL.OrdenPedidoBLL.readFactu_x_OP(oOrden.nroOrden);
+            var constatada = false;
+            if (existe != null && existe.Count > 0)
+                constatada = true;
+            else
+                constatada = false;
+            return pdfGenerator.GenerarPDF(oOrden, constatada, logoPath, usuario_imprime);//, Response);
 
         }
     }
