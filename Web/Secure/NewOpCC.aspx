@@ -123,8 +123,10 @@
                                         class="form-control" AutoPostBack="True"
                                         OnTextChanged="txtIdDestino_TextChanged1">
                                     </asp:TextBox>
-                                    <asp:CompareValidator ID="CompareValidator5" runat="server" ErrorMessage="Debe ingresar Oficina Detino" ControlToValidate="txtIdDestino" Operator="DataTypeCheck" Type="Integer" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:CompareValidator>
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="txtIdDestino" ErrorMessage="Debe Seleccionar Oficina Destino" SetFocusOnError="True" ValidationGroup="GroupDatos">*</asp:RequiredFieldValidator>
+                                    <asp:CompareValidator ID="CompareValidator5" runat="server" ErrorMessage="Debe ingresar Oficina Detino" 
+                                        ControlToValidate="txtIdDestino" Operator="DataTypeCheck" Type="Integer" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:CompareValidator>
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="txtIdDestino" 
+                                        ErrorMessage="Debe Seleccionar Oficina Destino" SetFocusOnError="True" ValidationGroup="GroupDatos">*</asp:RequiredFieldValidator>
                                 </div>
                                 <div class="col-xs-9">
                                     <label for="fecha">Nombre Oficina</label>
@@ -151,13 +153,16 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-6">
-                                    <label for="ejemplo_email_1">SecretariaAutoriza</label>
+                                    <label for="ejemplo_email_1">Secretaria Autoriza</label>
                                     <asp:DropDownList ID="ddlSecretariaAutoriza" runat="server" CssClass="form-control"
                                         AutoPostBack="True" OnSelectedIndexChanged="ddlSecretariaAutoriza_SelectedIndexChanged">
                                     </asp:DropDownList>
                                     <asp:RequiredFieldValidator ID="rfvSecretariaAutoriza" runat="server"
-                                        ErrorMessage="Debe seleccionar Secretaría" ControlToValidate="ddlSecretariaAutoriza"
-                                        ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                        ErrorMessage="Debe seleccionar Secretaría" 
+                                        ControlToValidate="ddlSecretariaAutoriza"
+                                        InitialValue="0"
+                                        ValidationGroup="GroupDatos" 
+                                        SetFocusOnError="True">*</asp:RequiredFieldValidator>                                    
                                     &nbsp;
                                 </div>
                                 <div class="col-xs-6">
@@ -166,8 +171,11 @@
                                         AutoPostBack="True" OnSelectedIndexChanged="ddlDireccionSolicitante_SelectedIndexChanged">
                                     </asp:DropDownList>
                                     <asp:RequiredFieldValidator ID="rfvDireccionSolicitante" runat="server"
-                                        ErrorMessage="Debe seleccionar Dirección" ControlToValidate="ddlDireccionSolicitante"
-                                        ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                        ErrorMessage="Debe seleccionar Dirección" 
+                                        ControlToValidate="ddlDireccionSolicitante"
+                                        InitialValue="0"
+                                        ValidationGroup="GroupDatos" 
+                                        SetFocusOnError="True">*</asp:RequiredFieldValidator>
                                 </div>
                             </div>
                         </div>
@@ -175,14 +183,14 @@
                             <div class="row">
                                 <div class="col-xs-6">
                                     <label for="ejemplo_email_1">Autorizado Por</label>
-                                    <input type="text" class="form-control" id="txtAut"
+                                    <input type="text" class="form-control" id="txtAut" disabled="disabled"
                                         runat="server" placeholder="Introduzca el nombre de quien autoriza" />
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Debe Ingresar Campo Autorizado Por" ControlToValidate="txtAut" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
                                     &nbsp;
                                 </div>
                                 <div class="col-xs-6">
                                     <label for="ejemplo_email_1">Solicitante</label>
-                                    <input type="text" class="form-control" id="txtSolicitante"
+                                    <input type="text" class="form-control" id="txtSolicitante" disabled="disabled"
                                         runat="server" placeholder="Introduzca el nombre de quien solicita" />
                                 </div>
                             </div>

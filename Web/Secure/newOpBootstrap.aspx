@@ -189,7 +189,8 @@
                                     <label for="ejemplo_email_1">Autorizado Por</label>
                                     <input type="text" class="form-control" id="txtAut" disabled="disabled"
                                         runat="server" placeholder="Introduzca el nombre de quien autoriza" />
-                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Debe Ingresar Campo Autorizado Por" ControlToValidate="txtAut" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="Debe Ingresar Campo Autorizado Por" 
+                                        ControlToValidate="txtAut" ValidationGroup="GroupDatos" SetFocusOnError="True">*</asp:RequiredFieldValidator>
                                     &nbsp;
                                 </div>
                                 <div class="col-xs-6">

@@ -28,8 +28,7 @@ namespace Web.Secure
                 if (Request.Cookies["UserOP"]["id_oficina_usuario"].ToString() != null)
                 {
                     P1.InnerText = Request.Cookies["UserOP"]["id_oficina_usuario"].ToString().ToString() + " - " +
-                    BLL.OficinasBLL.getOficinaByPk(Convert.ToInt32(
-                        Request.Cookies["UserOP"]["id_oficina_usuario"].ToString())).nombre;
+                    BLL.OficinasBLL.getOficinaByPk(Convert.ToInt32(Request.Cookies["UserOP"]["id_oficina_usuario"].ToString())).nombre;
                 }
                 Session.Add("Detalle", lstDetalle);
                 Session.Add("Total", 0);
@@ -99,6 +98,28 @@ namespace Web.Secure
             //ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
         }
 
+        private void CargarDesplegables(Entities.OrdenPedido obj)
+        {
+            ddlDireccionSolicitante.Items.Clear();
+
+            if (obj == null || obj.cod_secretaria_autoriza == null)
+            {
+                // 👇 Si no hay secretaria, muestro un ítem fijo
+                ddlDireccionSolicitante.Items.Add(new ListItem("-- No disponible --", "0"));
+                return;
+            }
+
+            int idsec = (int)obj.cod_secretaria_autoriza;
+
+            ddlDireccionSolicitante.DataTextField = "descripcion";
+            ddlDireccionSolicitante.DataValueField = "id_direccion";
+            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(idsec);
+            ddlDireccionSolicitante.DataBind();
+
+            // Ítem inicial
+            ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione una dirección --", "0"));
+        }
+
         protected void ddlSecretariaAutoriza_SelectedIndexChanged(object sender, EventArgs e)
         {
             int id = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
@@ -121,14 +142,28 @@ namespace Web.Secure
             UPanelDatos.Update();
         }
 
+        private void CargarDatosUsuario()
+        {
+            var cookie = Request.Cookies["UserOP"];
+            if (cookie != null && !string.IsNullOrEmpty(cookie["id_oficina_usuario"]))
+            {
+                int idOficina = Convert.ToInt32(cookie["id_oficina_usuario"]);
+                var oficina = BLL.OficinasBLL.getOficinaByPk(idOficina);
+                P1.InnerText = $"{idOficina} - {oficina.nombre}";
+            }
+        }
+
         protected void fillDatos(Entities.OrdenPedido oOp)
         {
+            CargarDesplegables(oOp);
             txtOP.InnerText = oOp.nroOrden.ToString();
             txtFechaOp.InnerText = oOp.fechaOrden.ToShortDateString();
             txtIdProv.Text = oOp.codProveedor.ToString();
             txtNameProv.Value = oOp.proveedor;
-            P1.InnerText = oOp.codOficinaOrigen.ToString();
-
+            //P1.InnerText = oOp.codOficinaOrigen.ToString();
+            int idOficina = oOp.codOficinaOrigen;
+            var oficina = BLL.OficinasBLL.getOficinaByPk(idOficina);
+            P1.InnerText = $"{idOficina} - {oficina.nombre}";
             txtAut.Value = oOp.aprobado;
             txtSolicitante.Value = oOp.solicitante;
             txtIdDestino.Text = oOp.codOficinaDestino.ToString();

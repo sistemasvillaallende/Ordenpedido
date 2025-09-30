@@ -46,7 +46,7 @@
   <ItemGroup>
     <Reference Include="AjaxControlToolkit, Version=15.1.3.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\AjaxControlToolkit.dll</HintPath>
+      <HintPath>..\..\AjaxControlToolkit.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.9\lib\net40\BouncyCastle.Crypto.dll</HintPath>
@@ -210,6 +210,10 @@
     <Content Include="App_Themes\bower_components\bootstrap-colorpicker\src\js\colorpicker-component.js" />
     <Content Include="App_Themes\bower_components\bootstrap-colorpicker\src\js\colorpicker-defaults.js" />
     <Content Include="App_Themes\bower_components\bootstrap-colorpicker\src\js\colorpicker-plugin-wrapper.js" />
+    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build.less" />
+    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build3.less" />
+    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build_standalone.less" />
+    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build_standalone3.less" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\dist\css\bootstrap-datepicker.css" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\dist\css\bootstrap-datepicker.min.css" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\dist\css\bootstrap-datepicker.standalone.css" />
@@ -6591,10 +6595,6 @@
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\.gitignore" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\.travis.yml" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\bower.json" />
-    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build.less" />
-    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build3.less" />
-    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build_standalone.less" />
-    <Content Include="App_Themes\bower_components\bootstrap-datepicker\build\build_standalone3.less" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\CHANGELOG.md" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\CODE_OF_CONDUCT.md" />
     <Content Include="App_Themes\bower_components\bootstrap-datepicker\composer.json" />
@@ -7053,6 +7053,8 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <Content Include="ErrorArchivos.aspx" />
+    <Content Include="ErrorGeneral.aspx" />
     <Content Include="img\afip-logo-nuevo.png" />
     <Content Include="img\error.png" />
     <Content Include="img\logogestion\encabezado.jpg" />
@@ -7068,7 +7070,6 @@
     <Content Include="Logout.aspx" />
     <Content Include="MP\HtmlPage1.html" />
     <Content Include="Reportes\ReporteOrdenPedido.aspx" />
-    <Content Include="Script\conexion.udl" />
     <Content Include="MP\Bootstrap.Master" />
     <Content Include="MP\Master.Master" />
     <Content Include="MP\Site2.Master" />
@@ -7089,8 +7090,6 @@
     <Content Include="Script\jquery-1.4.2.min.js" />
     <Content Include="Script\jquery-ui-1.8rc3.custom.min.js" />
     <Content Include="Script\jquery.min.js" />
-    <Content Include="Script\ReportesContables.dll" />
-    <Content Include="Script\ReporteWeb.dll" />
     <Content Include="Secure\accesodenegado.html" />
     <Content Include="Secure\AddFactura.aspx" />
     <Content Include="Secure\ExportPdf.aspx" />
@@ -7118,6 +7117,20 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorArchivos.aspx.cs">
+      <DependentUpon>ErrorArchivos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ErrorArchivos.aspx.designer.cs">
+      <DependentUpon>ErrorArchivos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorGeneral.aspx.cs">
+      <DependentUpon>ErrorGeneral.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ErrorGeneral.aspx.designer.cs">
+      <DependentUpon>ErrorGeneral.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

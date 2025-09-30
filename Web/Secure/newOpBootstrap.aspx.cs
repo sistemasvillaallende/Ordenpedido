@@ -153,6 +153,29 @@ namespace Web.Secure
             //ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione --", "0"));
         }
 
+        private void CargarDesplegables(Entities.OrdenPedido obj)
+        {
+
+            ddlDireccionSolicitante.Items.Clear();
+
+            if (obj == null || obj.cod_secretaria_autoriza == null)
+            {
+                // 👇 Si no hay secretaria, muestro un ítem fijo
+                ddlDireccionSolicitante.Items.Add(new ListItem("-- No disponible --", "0"));
+                return;
+            }
+
+            int idsec = (int)obj.cod_secretaria_autoriza;
+
+            ddlDireccionSolicitante.DataTextField = "descripcion";
+            ddlDireccionSolicitante.DataValueField = "id_direccion";
+            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(idsec);
+            ddlDireccionSolicitante.DataBind();
+
+            // Ítem inicial
+            ddlDireccionSolicitante.Items.Insert(0, new ListItem("-- Seleccione una dirección --", "0"));
+        }
+
         protected void ddlSecretariaAutoriza_SelectedIndexChanged(object sender, EventArgs e)
         {
             int id = Convert.ToInt32(ddlSecretariaAutoriza.SelectedValue);
@@ -174,15 +197,6 @@ namespace Web.Secure
             UPanelDatos.Update();
         }
 
-        private void CargarDesplegables(Entities.OrdenPedido obj)
-        {
-            int idsec = (int)obj.cod_secretaria_autoriza;
-            ddlDireccionSolicitante.Items.Clear();
-            ddlDireccionSolicitante.DataTextField = "descripcion";
-            ddlDireccionSolicitante.DataValueField = "id_direccion";
-            ddlDireccionSolicitante.DataSource = DAL.DesplegablesDAL.GetDirecciones(idsec);
-            ddlDireccionSolicitante.DataBind();
-        }
 
         protected void fillDatos(Entities.OrdenPedido oOp)
         {
@@ -642,10 +656,10 @@ namespace Web.Secure
                 return;
             }
 
-            if (!decimal.TryParse(txtPU.Text, out decimal precio) || precio <= 0)
+            if (!decimal.TryParse(txtPU.Text, out decimal precio))
             {
                 ScriptManager.RegisterStartupScript(this, this.GetType(), "alert",
-                    "alert('Ingrese un precio válido mayor a 0');", true);
+                    "alert('Ingrese un valor numérico válido');", true);
                 return;
             }
 
